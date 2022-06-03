@@ -1,3 +1,6 @@
+from msilib.schema import Component
+import re
+import base64
 import dash
 import dash_bootstrap_components as dbc
 import dash_daq as daq
@@ -6,7 +9,8 @@ from numpy import full
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-li = {'admin': ['admin', 'teacher']}
+li = {'admin': ['admin', 'teacher'],
+      'student': ['student']}
 
 app = Dash("EduFit", external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP, dbc.icons.FONT_AWESOME], suppress_callback_exceptions=True,
            meta_tags=[{'name': 'viewport',
@@ -104,16 +108,17 @@ index = dbc.Container([
             dbc.NavbarSimple(children=[
                 dbc.NavLink(children=["Log out ", html.I(className="bi bi-box-arrow-right ml-2")], href="/", active=True)], brand="EduFit", dark=True, color="primary", style={"color": "white", "font-size": "20px", "border-radius": "5px"}, class_name="mt-3", expand="sm", fluid=True), width={"size": 12})
     ], justify="center"),
-    dbc.Row([
-            dbc.Col(html.H3("Choose class(es)",
-                    className="text-primary mt-3 mb-3", style={"font-size": "20px"}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
-                "size": 2}, align="center", className="text-center mr-0"),
-            dbc.Col(dcc.Dropdown(id="cls-dpdn", value="",
-                    options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 3}, width={"size": 3}, className="mt-3 mb-3"),
-            dbc.Col(html.H3("Choose student(s)",
-                    className="text-primary mt-3 mb-3 ", style={"font-size": "20px"}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
-                "size": 2}, align="center", className="text-center mr-0"),
-            dbc.Col(dcc.Dropdown(id="cls-dpdn", value="", options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 3}, width={"size": 3}, className="mt-3 mb-3")], justify="center"),
+    html.Div(id="admin"),
+        #dbc.Row([
+               # dbc.Col(html.H3("Choose class(es)",
+               #     className="text-primary mt-3 mb-3", style={"font-size": "20px"}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
+               # "size": 2}, align="center", className="text-center mr-0"),
+               # dbc.Col(dcc.Dropdown(id="cls-dpdn", value="",
+               #     options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 3}, width={"size": 3}, className="mt-3 mb-3"), 
+               # dbc.Col(html.H3("Choose student(s)",
+               #     className="text-primary mt-3 mb-3 ", style={"font-size": "20px"}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
+               # "size": 2}, align="center", className="text-center mr-0"),            
+               # dbc.Col(dcc.Dropdown(id="cls-dpdn", value="", options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 3}, width={"size": 3}, className="mt-3 mb-3",)], justify="center"),
     html.Div([
         dbc.Row([
             dbc.Col(info_card, xs={"size": 12}, sm={"size": 8}, md={"size": 4}, width={"size": 4},
@@ -193,7 +198,7 @@ def update_output(n_clicks, uname, passw):
     if uname not in li:
         return "warning", dash.no_update, "Not a user", dash.no_update, dash.no_update
     if li[uname][0] == passw:
-        return "success", '/dashboard', "Success!", True, False
+        return "success", '/dashboard%'+base64.b64encode(uname.encode("utf-8")).decode("utf-8"), "Success!", True, False
     if uname in li.keys() and passw != li[uname][0]:
         return "danger", dash.no_update, "Wrong credentials", False, True
 
@@ -216,13 +221,46 @@ def update_output(n_clicks, uname, passw):
 
 
 @ app.callback(dash.dependencies.Output('page-content', 'children'),
-               [dash.dependencies.Input('url', 'pathname')])
+               [dash.dependencies.Input('url', 'pathname'),])    
 def display_page(pathname):
-    if pathname == '/dashboard':
-        return index
+    if re.findall("\A/dashboard", pathname) == ["/dashboard"]:
+
+            return index
+
     else:
         return login
 
+@ app.callback(Output(component_id="subname", component_property="children"),
+               [dash.dependencies.Input('url', 'pathname'),])
+def set_name(pathname):
+    if re.findall("\A/dashboard", pathname) == ["/dashboard"]:
+        return base64.b64decode(re.split("%",pathname)[1]).decode("utf-8")
+    else:
+        return None
+
+@ app.callback(
+    Output(component_id="admin", component_property="children"),
+    Input(component_id="subname", component_property="children"),
+)
+def update_output_row(input_children):
+    if not li.__contains__(input_children):
+        return None
+    if li[input_children].__contains__("teacher"):
+        return generate_dropdown()
+    else:
+        return None
+
+def generate_dropdown():
+    return dbc.Row([
+                dbc.Col(html.H3("Choose class(es)",
+                    className="text-primary mt-3 mb-3", style={"font-size": "20px"}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
+                "size": 2}, align="center", className="text-center mr-0"),
+                dbc.Col(dcc.Dropdown(id="cls-dpdn", value="",
+                    options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 3}, width={"size": 3}, className="mt-3 mb-3"), 
+                dbc.Col(html.H3("Choose student(s)",
+                    className="text-primary mt-3 mb-3 ", style={"font-size": "20px"}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
+                "size": 2}, align="center", className="text-center mr-0"),            
+                dbc.Col(dcc.Dropdown(id="cls-dpdn", value="", options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 3}, width={"size": 3}, className="mt-3 mb-3",)], justify="center"),
 
 if __name__ == "__main__":
     app.run_server(debug=True)
