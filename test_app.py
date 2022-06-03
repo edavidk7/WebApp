@@ -18,33 +18,33 @@ app.layout = html.Div([
 ])
 
 
-def generate_progress(steps, sleep, rate, frequency):
-    rec_steps = 10000
-    step_percent = 0
-    rec_sleep = 8
-    sleep_percent = 0
-    if steps <= rec_steps:
-        steps = int((steps/rec_steps)*100)
-        step_percent = steps
-    elif steps > rec_steps:
-        step_percent = int((steps/rec_steps)*100)
-        steps = 100
-    if sleep <= rec_sleep:
-        sleep = int((sleep/rec_sleep)*100)
-        sleep_percent = sleep
-    elif sleep > rec_sleep:
-        sleep_percent = int((sleep/rec_sleep)*100)
-        sleep = 100
+# def generate_progress(steps, sleep, rate, frequency):
+#     rec_steps = 10000
+#     step_percent = 0
+#     rec_sleep = 8
+#     sleep_percent = 0
+#     if steps <= rec_steps:
+#         steps = int((steps/rec_steps)*100)
+#         step_percent = steps
+#     elif steps > rec_steps:
+#         step_percent = int((steps/rec_steps)*100)
+#         steps = 100
+#     if sleep <= rec_sleep:
+#         sleep = int((sleep/rec_sleep)*100)
+#         sleep_percent = sleep
+#     elif sleep > rec_sleep:
+#         sleep_percent = int((sleep/rec_sleep)*100)
+#         sleep = 100
 
-    return [
-        dbc.Progress(
-            value=steps, label=f"{step_percent} % doporučené {frequency} hodnoty", className="mt-1 mb-3", style={"height": "30px", "font-size": "20px"}),
-        dbc.Progress(
-            value=sleep, label=f"{sleep_percent} % doporučené {frequency} hodnoty", className="mt-3 mb-3", style={"height": "30px", "font-size": "20px"}),
-        dbc.Progress(
-            value=rate, label="Normální", className="mt-3 mb-3", style={"height": "30px", "font-size": "20px"},
-            color="success")
-    ]
+#     return [
+#         dbc.Progress(
+#             value=steps, label=f"{step_percent} % doporučené {frequency} hodnoty", className="mt-1 mb-3", style={"height": "30px", "font-size": "20px"}),
+#         dbc.Progress(
+#             value=sleep, label=f"{sleep_percent} % doporučené {frequency} hodnoty", className="mt-3 mb-3", style={"height": "30px", "font-size": "20px"}),
+#         dbc.Progress(
+#             value=rate, label="Normální", className="mt-3 mb-3", style={"height": "30px", "font-size": "20px"},
+#             color="success")
+#     ]
 
 
 def generate_values(steps, sleep, rate, freq):
@@ -125,17 +125,23 @@ index = dbc.Container([
                     className="text-primary mb-4", style={"font-size": "20px"}),
                 html.H3("Tep",
                     className="text-primary mb-4", style={"font-size": "20px"})
-            ], width={"size": 1}, align="end"),
+            ], xs={"size": 2}, sm={"size": 1}, md={"size": 1}, width={"size": 1}, align="center"),
             dbc.Col([
-                dcc.RadioItems(id="freqvaltype", value="Denní průměr", options=[
-                    "Týdenní průměr", "Denní průměr", "Hodinový průměr"], labelClassName="m-1", inputClassName="m-1", inline=True),
-                html.Div(children="", id="bars")], width={"size": 5}, className="text-center", align="center"),
-            dbc.Col([
-                dcc.RadioItems(id="valbar", value="%", options=[{'label': 'Procenta', 'value': '%'},
-                                                                {'label': 'Hodnoty', 'value': 'num'}], inputClassName="m-1", className="mt-4 mb-2", inline=False)
+                # dcc.RadioItems(id="freqvaltype", value="Denní průměr", options=[
+                #     "Týdenní průměr", "Denní průměr", "Hodinový průměr"], labelClassName="m-1", inputClassName="m-1", inline=True),
+                # html.Div(children="", id="bars")], width={"size": 5}, className="text-center", align="center")
+                #  dbc.Col([
+                #     dcc.RadioItems(id="valbar", value="%", options=[{'label': 'Procenta', 'value': '%'},
+                #                                                     {'label': 'Hodnoty', 'value': 'num'}], inputClassName="m-1", className="mt-4 mb-2", inline=False)
+                dbc.Progress(
+                    value=79, label="79 % doporučené denní hodnoty", className="mt-3 mb-3", style={"height": "30px", "font-size": "20px"}),
+                dbc.Progress(
+                    value=94, label=f"94 % doporučené denní hodnoty", className="mt-3 mb-3", style={"height": "30px", "font-size": "20px"}),
+                dbc.Progress(
+                    value=65, label="Normální", className="mt-3 mb-3", style={"height": "30px", "font-size": "20px"},
+                    color="success")], xs={"size": 10}, sm={"size": 6}, width={"size": 6}, className="text-center", align="center")
 
-
-            ], width={"size": 1}, align="center")
+            # ], width={"size": 1}, align="center")
         ], justify="center"),
         dbc.Row([
             dbc.Col(
@@ -192,21 +198,21 @@ def update_output(n_clicks, uname, passw):
         return "danger", dash.no_update, "Wrong credentials", False, True
 
 
-@ app.callback([Output('bars', 'children')], [Input('freqvaltype', 'value'), Input('valbar', 'value')])
-def update_bars(freqvaltype, valbar):
-    freq = ""
-    if freqvaltype == "Denní průměr":
-        freq = "denní"
-    if freqvaltype == "Týdenní průměr":
-        freq = "týdenní"
-    if freqvaltype == "Hodinový průměr":
-        freq = "hodinové"
+# @ app.callback([Output('bars', 'children')], [Input('freqvaltype', 'value'), Input('valbar', 'value')])
+# def update_bars(freqvaltype, valbar):
+#     freq = ""
+#     if freqvaltype == "Denní průměr":
+#         freq = "denní"
+#     if freqvaltype == "Týdenní průměr":
+#         freq = "týdenní"
+#     if freqvaltype == "Hodinový průměr":
+#         freq = "hodinové"
 
-    if valbar == "%":
-        content = generate_progress(10000, 9, 65, freq)
-    elif valbar == "num":
-        content = generate_values(10000, 9, 65, freq)
-    return [content]
+#     if valbar == "%":
+#         content = generate_progress(10000, 9, 65, freq)
+#     elif valbar == "num":
+#         content = generate_values(10000, 9, 65, freq)
+#     return [content]
 
 
 @ app.callback(dash.dependencies.Output('page-content', 'children'),
