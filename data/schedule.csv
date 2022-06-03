@@ -1,0 +1,23 @@
+day,subject,from,to,school
+Monday,Czech,8:00,8:45,TRUE
+Monday,Math,8:55,9:40,TRUE
+Monday,Natural Science,9:50,10:35,TRUE
+Monday,Czech,11:00,11:45,TRUE
+Tuesday,Czech,8:00,8:45,TRUE
+Tuesday,Math,8:55,9:40,TRUE
+Tuesday,Physical Education,9:50,10:35,TRUE
+Tuesday,English,11:00,11:45,TRUE
+Tuesday,Czech,11:55,12:40,TRUE
+Wednesday,Czech,8:00,8:45,TRUE
+Wednesday,Math,8:55,9:40,TRUE
+Wednesday,Art,9:50,10:35,TRUE
+Wednesday,Work Activities,11:00,11:45,TRUE
+Thursday,Czech,8:00,8:45,TRUE
+Thursday,Math,8:55,9:40,TRUE
+Thursday,Czech,9:50,10:35,TRUE
+Thursday,Physical Education,11:00,11:45,TRUE
+Thursday,Natural Science,11:55,12:40,TRUE
+Friday,Czech,8:00,8:45,TRUE
+Friday,Math,8:55,9:40,TRUE
+Friday,Czech,9:50,10:35,TRUE
+Friday,Music,11:00,11:45,TRUE

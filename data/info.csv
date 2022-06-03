@@ -1,0 +1,11 @@
+id,alias,sn,birth,sex,height,weight,laterality,sleep
+4,Band 04,374,2013,female,128,23.0,right,True
+5,Band 05,824,2013,female,125,26.0,right,True
+6,Band 06,938,2012,female,136,33.0,right,True
+9,Band 09,191,2011,male,150,38.0,right,True
+10,Band 10,227,2011,female,137,25.0,right,True
+11,Band 11,222,2012,male,133,29.0,left,True
+12,Band 12,225,2012,female,146,36.0,right,False
+15,Band 15,38,2011,female,150,40.0,right,False
+16,Band 16,955,2013,female,134,34.0,right,True
+17,Band 17,832,2012,female,136,31.5,right,True
