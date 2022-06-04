@@ -346,8 +346,8 @@ def update_card(_class, wk, stu):
     student_sex = temp["Sex"].unique()[0]
     figs = generate_graphs(file, stu)
     means = generate_average(file, stu)
-    steps_count = int(means[0])
-    steps_percent = int(means[0]/110000)
+    steps_count = int(means[1])
+    steps_percent = int(means[1]/110)
     return f"Třída: 3.B", f"Věk: {student_age}", f"Pohlaví: {student_sex}", figs[0], figs[1], figs[2], steps_percent, steps_count
 
 
