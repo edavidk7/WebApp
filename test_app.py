@@ -3,16 +3,17 @@ import base64
 import dash
 import dash_bootstrap_components as dbc
 import dash_daq as daq
-from dash import Dash, Input, Output, dcc, html, State
+from dash import Dash, Input, Output, dcc, html, State, ctx
 from numpy import full
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.io import write_image
 import plotly.graph_objs as go
+import time
 
 li = {'admin': ['admin', 'teacher'],
-      'student': ['student']}
+      'Band 19': ['student']}
 
 darker = "#242F9B"
 dark = "#646FD4"
@@ -247,19 +248,17 @@ def set_name(pathname):
 
 @ app.callback(
     Output(component_id="admin", component_property="children"),
-    Input(component_id="subname", component_property="children"),
+    Input(component_id="url", component_property="pathname"),
 )
-def update_output_row(input_children):
-    if not li.__contains__(input_children):
+def update_output_row(pathname):
+    if not li.__contains__(base64.b64decode(re.split("%", pathname)[1]).decode("utf-8")):
         return None
-    if li[input_children].__contains__("teacher"):
+    if li[base64.b64decode(re.split("%", pathname)[1]).decode("utf-8")].__contains__("teacher"):
         return generate_dropdown()
     else:
         return None
-
-
 @ app.callback([Output("stuclass", "children"), Output("stuage", "children"), Output("stusex", "children")],
-               [Input("cls-dpdn", "value"), Input("wk-dpdn", "value"), Input("st-dpdn", "value")])
+            [Input("cls-dpdn", "value"), Input("wk-dpdn", "value"), Input("st-dpdn", "value")])
 def update_card(_class, wk, stu):
     df = load_dataframe(file)
     temp = df[df["ALIAS"] == stu]
