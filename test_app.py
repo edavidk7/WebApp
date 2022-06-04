@@ -8,8 +8,13 @@ from numpy import full
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+from plotly.io import write_image
+import plotly.graph_objs as go
+
 li = {'admin': ['admin', 'teacher'],
       'student': ['student']}
+
+list_of_names = ["Karel Poláček", "2", "3", "4", "5", "6"]
 
 darker = "#242F9B"
 dark = "#646FD4"
@@ -147,7 +152,7 @@ index = dbc.Container([
         dbc.Row([dbc.Col(html.H1(" "))]),
         dbc.Row([
             dbc.Col(
-                dcc.Graph(id="stepgraph", figure={
+                dcc.Graph(id="graph", figure={
                     'data': [
                         {'x': [1, 2, 3], 'y': [4, 1, 2],
                             'type': 'bar', 'name': 'SF'},
@@ -244,11 +249,16 @@ def generate_dropdown():
                         className="mt-3 mb-3", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
                 "size": 2}, align="center", className="text-center mr-0"),
         dbc.Col(dcc.Dropdown(id="cls-dpdn", value="",
-                             options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 3}, width={"size": 3}, className="mt-3 mb-3"),
+                             options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3"),
+        dbc.Col(html.H3("Choose week",
+                        className="mt-3 mb-3", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
+                "size": 2}, align="center", className="text-center mr-0"),
+        dbc.Col(dcc.Dropdown(id="cls-dpdn", value="",
+                             options=["1", "2"]), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3"),                    
         dbc.Col(html.H3("Choose student(s)",
                         className="mt-3 mb-3 ", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
                 "size": 2}, align="center", className="text-center mr-0"),
-        dbc.Col(dcc.Dropdown(id="cls-dpdn", value="", options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 3}, width={"size": 3}, className="mt-3 mb-3")], justify="center"),
+        dbc.Col(dcc.Dropdown(id="cls-dpdn", value="", options=list_of_names), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3")], justify="center"),
 
 
 if __name__ == "__main__":

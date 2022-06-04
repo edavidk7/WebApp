@@ -1,34 +1,75 @@
-# Run this app with `python app.py` and
-# visit http://127.0.0.1:8050/ in your web browser.
-
-from dash import Dash, html, dcc
-import plotly.express as px
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
 import pandas as pd
+import urllib
 
-app = Dash(__name__)
-
-# assume you have a "long-form" data frame
-# see https://plotly.com/python/px-arguments/ for more options
 df = pd.DataFrame({
-    "Fruit": ["Apples", "Oranges", "Bananas", "Apples", "Oranges", "Bananas"],
-    "Amount": [4, 1, 2, 2, 4, 5],
-    "City": ["SF", "SF", "SF", "Montreal", "Montreal", "Montreal"]
+    'a': [1, 2, 3, 4],
+    'b': [2, 1, 5, 6],
+    'c': ['x', 'x', 'y', 'y']
 })
 
-fig = px.bar(df, x="Fruit", y="Amount", color="City", barmode="group")
 
-app.layout = html.Div(children=[
-    html.H1(children='Hello Dash'),
+def generate_table(dataframe, max_rows=10):
+    return html.Table(
+        # Header
+        [html.Tr([html.Th(col) for col in dataframe.columns])] +
 
-    html.Div(children='''
-        Dash: A web application framework for your data.
-    '''),
+        # Body
+        [html.Tr([
+            html.Td(dataframe.iloc[i][col]) for col in dataframe.columns
+        ]) for i in range(min(len(dataframe), max_rows))]
+    )
 
-    dcc.Graph(
-        id='example-graph',
-        figure=fig
+
+app = dash.Dash(__name__)
+app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/bWLwgP.css"})
+app.layout = html.Div([
+    html.Label('Filter'),
+
+    dcc.Dropdown(
+        id='field-dropdown',
+        options=[
+            {'label': i, 'value': i} for i in
+            (['all'] + list(df['c'].unique()))],
+        value='all'
+    ),
+    html.Div(id='table'),
+    html.A(
+        'Download Data',
+        id='download-link',
+        download="rawdata.csv",
+        href="",
+        target="_blank"
     )
 ])
+
+
+def filter_data(value):
+    if value == 'all':
+        return df
+    else:
+        return df[df['c'] == value]
+
+
+@app.callback(
+    dash.dependencies.Output('table', 'children'),
+    [dash.dependencies.Input('field-dropdown', 'value')])
+def update_table(filter_value):
+    dff = filter_data(filter_value)
+    return generate_table(dff)
+
+
+@app.callback(
+    dash.dependencies.Output('download-link', 'href'),
+    [dash.dependencies.Input('field-dropdown', 'value')])
+def update_download_link(filter_value):
+    dff = filter_data(filter_value)
+    csv_string = dff.to_csv(index=False, encoding='utf-8')
+    csv_string = "data:text/csv;charset=utf-8," + urllib.quote(csv_string)
+    return csv_string
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
