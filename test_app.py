@@ -35,6 +35,7 @@ red = "#C85C5C"
 orange = "#F9975D"
 yellow = "#FBD148"
 green = "#B2EA70"
+prumer_kroky_list = []
 
 app = Dash("EduFit", external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP, dbc.icons.FONT_AWESOME], suppress_callback_exceptions=True,
            meta_tags=[{'name': 'viewport',
@@ -44,7 +45,32 @@ app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
 ])
+def generate_average(file, stu):
+    df = load_dataframe(file)
+    df_person = df[df["ALIAS"] == stu]
+    ys2 = []
+    for weekday in df["WEEK_DAY"].unique():
+        daily_entries = df_person[df_person["WEEK_DAY"] == weekday]
+        total_steps = daily_entries["STEPS"].sum()
+        ys2.append(total_steps)
+    ys2 = sum(ys2)/7
+    ys3 = []
+    for weekday in df["WEEK_DAY"].unique():
+        daily_entries = df_person[df_person["WEEK_DAY"] == weekday]
 
+        def inner_func(x):
+            return x < 250 and x > 30
+
+        def inner_func2(x):
+            return x in kind_codes["Walking"] or x in kind_codes["Standing"] or x in kind_codes["Sit"]
+        valid_entries = daily_entries[daily_entries["HEART_RATE"].map(
+            inner_func)]
+        valid_entries = valid_entries[valid_entries["HEART_RATE"].map(
+            inner_func2)]
+        total_heart_rate = valid_entries["HEART_RATE"].sum()
+        ys3.append(total_heart_rate/valid_entries["HEART_RATE"].count())
+    ys3 = sum(ys3)/7
+    return ys3, ys2
 
 def generate_graphs(file, stu):
     df = load_dataframe(file)
@@ -74,6 +100,7 @@ def generate_graphs(file, stu):
     fig2 = px.bar(x=xs, y=ys, title="Daily steps")
     xs = []
     ys = []
+
     for weekday in df["WEEK_DAY"].unique():
         daily_entries = df_person[df_person["WEEK_DAY"] == weekday]
 
@@ -118,17 +145,17 @@ def generate_dropdown(file):
         dbc.Col(html.H3("Choose class(es)",
                         className="mt-3 mb-3", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
                 "size": 2}, align="center", className="text-center mr-0"),
-        dbc.Col(dcc.Dropdown(id="cls-dpdn", value="1",
-                             options=["1", "2"]), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3"),
+        dbc.Col(dcc.Dropdown(id="cls-dpdn",
+                             options=["3.B"]), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3"),
         dbc.Col(html.H3("Choose week",
                         className="mt-3 mb-3", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
                 "size": 2}, align="center", className="text-center mr-0"),
-        dbc.Col(dcc.Dropdown(id="wk-dpdn", value="Prezenční",
+        dbc.Col(dcc.Dropdown(id="wk-dpdn",
                              options=["Distanční", "Prezenční"]), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3"),
         dbc.Col(html.H3("Choose student(s)",
                         className="mt-3 mb-3 ", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
                 "size": 2}, align="center", className="text-center mr-0"),
-        dbc.Col(dcc.Dropdown(id="st-dpdn", value="Band 19", options=names), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3")], justify="center"),
+        dbc.Col(dcc.Dropdown(id="st-dpdn", options=names), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3")], justify="center"),
 
 
 def generate_card(name, age, classname, sex):
@@ -214,11 +241,11 @@ index = dbc.Container([
                 #     dcc.RadioItems(id="valbar", value="%", options=[{'label': 'Procenta', 'value': '%'},
                 #                                                     {'label': 'Hodnoty', 'value': 'num'}], inputClassName="m-1", className="mt-4 mb-2", inline=False)
                 dbc.Progress(
-                    value=40, color=red, striped=True, label="4000/10000", className="mb-3", id="step", style={"height": "40px", "font-size": "20px", "border-radius": "25px", 'margin-top': 20}),
+                    value=40, color=red, striped=True, label="4000/10000", className="mb-3", id="steps", style={"height": "40px", "font-size": "20px", "border-radius": "25px", 'margin-top': 20}),
                 dbc.Progress(
-                    value=94, color=green, striped=True, label=f"9h/10h", className="mb-3", style={"height": "40px", "font-size": "20px", "border-radius": "25px"}),
+                    value=94, color=green, striped=True, label=f"9h/10h", className="mb-3", id="sleep", style={"height": "40px", "font-size": "20px", "border-radius": "25px"}),
                 dbc.Progress(
-                    value=65, color=yellow, striped=True, label="Zvýšený", className="mb-3", style={"height": "40px", "font-size": "20px", "border-radius": "25px"}
+                    value=65, color=yellow, striped=True, label="Zvýšený", className="mb-3", id="heartrate", style={"height": "40px", "font-size": "20px", "border-radius": "25px"}
                 )], xs={"size": 9}, sm={"size": 6}, width={"size": 6}, className="text-center", align="center"),
             dbc.Col(html.Hr(style={'borderWidth': "0.3vh", "width": "100%",
                     "backgroundColor": "#B4E1FF", "opacity": "1"}), width={'size': 10}),
@@ -309,7 +336,8 @@ def update_output_row(input_children):
 
 
 @ app.callback([Output("stuclass", "children"), Output("stuage", "children"), Output("stusex", "children"),
-                Output("graph-1", "figure"), Output("graph-2", "figure"), Output("graph-3", "figure")],
+                Output("graph-1", "figure"), Output("graph-2", "figure"), Output("graph-3", "figure"),
+                Output("steps","value"), Output("steps","label")],
                [Input("cls-dpdn", "value"), Input("wk-dpdn", "value"), Input("st-dpdn", "value")])
 def update_card(_class, wk, stu):
     if wk == "Distanční":
@@ -321,7 +349,10 @@ def update_card(_class, wk, stu):
     student_age = 2022-int(temp["YoB"].unique()[0])
     student_sex = temp["Sex"].unique()[0]
     figs = generate_graphs(file, stu)
-    return f"Třída: {_class}", f"Věk: {student_age}", f"Pohlaví: {student_sex}", figs[0], figs[1], figs[2]
+    means = generate_average(file, stu)
+    steps_count = int(means[0])
+    steps_percent = int(means[0]/110000)
+    return f"Třída: 3.B", f"Věk: {student_age}", f"Pohlaví: {student_sex}", figs[0], figs[1], figs[2], steps_percent, steps_count
 
 
 if __name__ == "__main__":
