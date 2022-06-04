@@ -35,6 +35,7 @@ red = "danger"
 orange = "#F9975D"
 yellow = "warning"
 green = "success"
+alert_text = " "
 
 app = Dash("EduFit", external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP, dbc.icons.FONT_AWESOME], suppress_callback_exceptions=True,
            meta_tags=[{'name': 'viewport',
@@ -199,6 +200,10 @@ login = dbc.Container([
     ], justify="center"),
 ])
 
+alert_card = dbc.Card([
+    dbc.Row([dbc.Col(html.H1(alert_text), style={"margin-left":10, 'padding': '10px', 'font-size': '5px', 'border-width': '3px', "color":"white"})])
+], color=yellow, style={"border-radius": "25px"})
+
 index = dbc.Container([
     dbc.Row([
         dbc.Col(
@@ -250,7 +255,7 @@ index = dbc.Container([
         ], justify="center"),
         dbc.Row([
             dbc.Col(html.H3("Fitness doporučení: ", className="text-center m-4"), align="center", style={"color": dark}, xs={"size": 8}, sm={"size": 6}, md={"size": 3}, width={"size": 3}),
-            dbc.Col(dbc.Alert(" ", color="white", className="mt-4 mb-4"), id="one", align="center", style={"color": "white"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
+            dbc.Col(alert_card, id="one", align="center", style={"color": "white"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
             dbc.Col(dbc.Alert(" ", color="white", className="mt-4 mb-4"), id="two", align="center", style={"color": "white"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
         ], justify="center"),
         dbc.Row([
@@ -343,15 +348,17 @@ def update_card(_class, wk, stu):
     student_sex = temp["Sex"].unique()[0]
     figs = generate_graphs(file, stu)
     means = generate_average(file, stu)
-    steps_count = str(int(means[1])) + " kroků za den"
+    steps_count = "průměrně " + str(int(means[1])) + " kroků za den"
     steps_percent = int(means[1]/110)
     heartbeat_count = str(int(means[0])) + " BPM"
     heartbeat_percent = int(means[0]/1.5)
 
     if steps_percent < 50:
         colorBarSteps = red
+        alert_text = "Průměrný počet kroků je velmi slabý"
     elif steps_percent >= 50 and steps_percent < 75:
         colorBarSteps = yellow
+        alert_text = "Průměrný počet kroků je podprůměrný"
     else:
         colorBarSteps = green
         
