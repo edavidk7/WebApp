@@ -131,10 +131,6 @@ def generate_dropdown(file):
         dbc.Col(dcc.Dropdown(id="st-dpdn", value="Band 19", options=names), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3")], justify="center"),
 
 
-def generate_card(name, age, classname, sex):
-    return None
-
-
 info_card = dbc.Card([
     dbc.Row([
         dbc.Col(
