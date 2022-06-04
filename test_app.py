@@ -16,7 +16,7 @@ dark = "#646FD4"
 white = "#E8F9FD"
 lighter = "#ea6c36"
 light = "#DBDFFD"
-
+file = "data/dbs/data_merged_cet.feather"
 red = "#C85C5C"
 orange = "#F9975D"
 yellow = "#FBD148"
@@ -31,35 +31,9 @@ app.layout = html.Div([
     html.Div(id='page-content')
 ])
 
-
-# def generate_progress(steps, sleep, rate, frequency):
-#     rec_steps = 10000
-#     step_percent = 0
-#     rec_sleep = 8
-#     sleep_percent = 0
-#     if steps <= rec_steps:
-#         steps = int((steps/rec_steps)*100)
-#         step_percent = steps
-#     elif steps > rec_steps:
-#         step_percent = int((steps/rec_steps)*100)
-#         steps = 100
-#     if sleep <= rec_sleep:
-#         sleep = int((sleep/rec_sleep)*100)
-#         sleep_percent = sleep
-#     elif sleep > rec_sleep:
-#         sleep_percent = int((sleep/rec_sleep)*100)
-#         sleep = 100
-
-#     return [
-#         dbc.Progress(
-#             value=steps, label=f"{step_percent} % doporučené {frequency} hodnoty", className="mt-1 mb-3", style={"height": "30px", "font-size": "20px"}),
-#         dbc.Progress(
-#             value=sleep, label=f"{sleep_percent} % doporučené {frequency} hodnoty", className="mt-3 mb-3", style={"height": "30px", "font-size": "20px"}),
-#         dbc.Progress(
-#             value=rate, label="Normální", className="mt-3 mb-3", style={"height": "30px", "font-size": "20px"},
-#             color="success")
-#     ]
-
+def load_dataframe(file):
+    df = pd.read_feather(file)
+    
 
 def generate_values(steps, sleep, rate, freq):
     return [
