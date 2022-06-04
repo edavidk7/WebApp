@@ -3,14 +3,13 @@ import base64
 import dash
 import dash_bootstrap_components as dbc
 import dash_daq as daq
-from dash import Dash, Input, Output, dcc, html, State, ctx
+from dash import Dash, Input, Output, dcc, html, State
 from numpy import full
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.io import write_image
 import plotly.graph_objs as go
-import time
 
 li = {'admin': ['admin', 'teacher'],
       'student': ['student']}
@@ -323,10 +322,10 @@ def set_name(pathname):
     Output(component_id="admin", component_property="children"),
     Input(component_id="subname", component_property="children"),
 )
-def update_output_row(uname):
-    if not li.__contains__(uname):
+def update_output_row(input_children):
+    if not li.__contains__(input_children):
         return None
-    if li[uname].__contains__("teacher"):
+    if li[input_children].__contains__("teacher"):
         return generate_dropdown(file1)
     else:
         return None
