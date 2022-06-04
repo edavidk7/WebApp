@@ -422,7 +422,7 @@ def update_card(_class, wk, stu):
 
         return f"Třída: 3.B", f"Věk: {student_age}", f"Pohlaví: {student_sex}", figs[0], figs[1], figs[2], steps_percent, steps_count, colorBarSteps, heartbeat_percent, heartbeat_count, colorBarHR
     else:
-        return "Třída: 3.B","Počet Studentů: 20","", dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+        return "Třída: 3.B", "Počet Studentů: 20", "", dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
 
 
 @ app.callback([Output("sleep", "value"), Output("sleep", "label"), Output("sleep", "color"), Output("graph-4", "figure")],
