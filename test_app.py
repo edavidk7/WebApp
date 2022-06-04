@@ -44,6 +44,8 @@ app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
 ])
+
+
 def generate_average(file, stu):
     df = load_dataframe(file)
     df_person = df[df["ALIAS"] == stu]
@@ -70,6 +72,7 @@ def generate_average(file, stu):
         ys3.append(total_heart_rate/valid_entries["HEART_RATE"].count())
     ys3 = sum(ys3)/7
     return ys3, ys2
+
 
 def generate_graphs(file, stu):
     df = load_dataframe(file)
@@ -306,22 +309,19 @@ def display_page(pathname):
 
 
 @ app.callback(Output(component_id="subname", component_property="children"),
-               [dash.dependencies.Input('url', 'pathname'), ])
-def set_name(pathname):
-    if re.findall("\A/dashboard", pathname) == ["/dashboard"]:
-        return base64.b64decode(re.split("%", pathname)[1]).decode("utf-8")
-    else:
-        return None
+               [dash.dependencies.Input("st-dpdn", "value"), ])
+def set_name(input_value):
+        return input_value
 
 
 @ app.callback(
     Output(component_id="admin", component_property="children"),
-    Input(component_id="subname", component_property="children"),
+    Input(component_id="url", component_property="pathname"),
 )
-def update_output_row(input_children):
-    if not li.__contains__(input_children):
+def update_output_row(pathname):
+    if not li.__contains__(base64.b64decode(re.split("%", pathname)[1]).decode("utf-8")):
         return None
-    if li[input_children].__contains__("teacher"):
+    if li[base64.b64decode(re.split("%", pathname)[1]).decode("utf-8")].__contains__("teacher"):
        return generate_dropdown(file1)
     else:
         return None
