@@ -1,11 +1,14 @@
+import datetime as dt
 import re
 import base64
+from turtle import color
 import dash
 import dash_bootstrap_components as dbc
 import dash_daq as daq
 from dash import Dash, Input, Output, dcc, html, State
 from numpy import full
 import pandas as pd
+import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.io import write_image
@@ -23,7 +26,7 @@ kind_codes = {"Running": [98, 50, 66, 82],
               "NotWorn": [3],
               "NotWorn_Charging": [6],
               "NotWorn_FaceUp": [83],
-              "NotWorn_FaceDown": 115}
+              "NotWorn_FaceDown": [115]}
 darker = "#242F9B"
 dark = "#646FD4"
 white = "#E8F9FD"
@@ -45,6 +48,30 @@ app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
 ])
+
+
+def generate_piechart(file, _stu):
+    merged_all = load_dataframe(file)
+    new_kind_codes = {}
+    for key in kind_codes.keys():
+        arr = kind_codes[key]
+        for code in arr:
+            new_kind_codes[code] = key
+    merged_all = merged_all[merged_all["ALIAS"] == _stu]
+    merged_all["KIND"] = merged_all["RAW_KIND"].map(
+        lambda x: new_kind_codes.get(x))
+    sleep_df = merged_all.loc[(merged_all["KIND"] == "Heavy_Sleep") | (
+        merged_all["KIND"] == "Light_Sleep")]
+    sleep_df = merged_all.copy().loc[(merged_all["KIND"] == "Heavy_Sleep") | (
+        merged_all["KIND"] == "Light_Sleep")]
+    sleep_df["HOURLY"] = sleep_df["DATETIME_CET"].dt.time
+    sleep_df_alt = sleep_df[np.logical_or(
+        sleep_df["HOURLY"] >= dt.time(20, 0), sleep_df["HOURLY"] < dt.time(8, 0))]
+    thing = sleep_df_alt.groupby(by="KIND").count()
+    thing.reset_index(inplace=True)
+    fig = px.pie(thing, names=["Hluboký spánek", "Lehký spánek"],
+                 values="Weight", title="Kvalita spánku")
+    return fig
 
 
 def generate_average(file, stu):
@@ -73,6 +100,35 @@ def generate_average(file, stu):
         ys3.append(total_heart_rate/valid_entries["HEART_RATE"].count())
     ys3 = sum(ys3)/7
     return ys3, ys2
+
+
+def daily_sleep(file, person):
+    merge_all = load_dataframe(file)
+    all_time = []
+    light_time = []
+    heavy_time = []
+    merge_all["HOURLY"] = merge_all["DATETIME_CET"].dt.time
+    sleep_df_alt = merge_all[np.logical_or(
+        merge_all["HOURLY"] >= dt.time(20, 0), merge_all["HOURLY"] < dt.time(8, 0))]
+
+    new_kind_codes = {}
+    for key in kind_codes.keys():
+        arr = kind_codes[key]
+        for code in arr:
+            new_kind_codes[code] = key
+    # new_kind_codes
+    sleep_df_alt["KIND"] = sleep_df_alt["RAW_KIND"].map(
+        lambda x: new_kind_codes.get(x))
+    sleep_df_alt = sleep_df_alt[np.logical_or(
+        sleep_df_alt["KIND"] == "Heavy_Sleep", sleep_df_alt["KIND"] == "Light_Sleep")]
+    sleep_df_alt = sleep_df_alt[sleep_df_alt["ALIAS"] == person]
+    for day in sleep_df_alt["DATETIME_CET"].dt.date.unique():
+        new_df = sleep_df_alt[sleep_df_alt["DATETIME_CET"].dt.date == day]
+        series = new_df["KIND"]
+        all_time.append(series.count())
+        light_time.append(series[series == "Light_Sleep"].count())
+        heavy_time.append(series[series == "Heavy_Sleep"].count())
+    return all_time, light_time, heavy_time
 
 
 def generate_graphs(file, stu):
@@ -118,7 +174,7 @@ def generate_graphs(file, stu):
             inner_func2)]
         total_heart_rate = valid_entries["HEART_RATE"].sum()
         xs.append(weekday)
-        ys.append(total_heart_rate/valid_entries["HEART_RATE"].count())
+        ys.append(int(total_heart_rate/valid_entries["HEART_RATE"].count()))
 
     fig3 = px.bar(x=xs, y=ys, title="Průměrný srdeční tep", text_auto=True)
 
@@ -128,17 +184,6 @@ def generate_graphs(file, stu):
 def load_dataframe(file):
     df = pd.read_feather(file)
     return df
-
-
-def generate_values(steps, sleep, rate, freq):
-    return [
-        html.H4(f"{steps} kroků (doporučeno: 10 000)", style={
-                "height": "30px", "font-size": "25px"}, className="mt-1 mb-3"),
-        html.H4(f"{sleep} hodin (doporučeno: 8 h)", style={
-                "height": "30px", "font-size": "25px"}, className="mt-3 mb-3"),
-        html.H4(f"{rate} tepů/min (normál 60-70)",
-                style={"height": "30px", "font-size": "25px"}, className="mt-3 mb-3")
-    ]
 
 
 def generate_dropdown(file):
@@ -158,7 +203,12 @@ def generate_dropdown(file):
         dbc.Col(html.H3("Výběr studenta",
                         className="mt-3 mb-3 ", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
                 "size": 2}, align="center", className="text-center mr-0"),
+       
         dbc.Col(dcc.Dropdown(id="st-dpdn", options=names, value="Band 20",), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3")], justify="center"),
+
+def generate_alerts(alert1,color1):
+    return  dbc.Alert(alert1,color=color1, class_name="mt-4 mb-4")
+    
 
 info_card = dbc.Card([
     dbc.Row([
@@ -199,10 +249,6 @@ login = dbc.Container([
                 "size": 4}, className="text-center mt-3")
     ], justify="center"),
 ])
-
-alert_card = dbc.Card([
-    dbc.Row([dbc.Col(html.H1(alert_text), style={"margin-left":10, 'padding': '10px', 'font-size': '5px', 'border-width': '3px', "color":"white"})])
-], color=yellow, style={"border-radius": "25px"})
 
 index = dbc.Container([
     dbc.Row([
@@ -254,12 +300,16 @@ index = dbc.Container([
             # ], width={"size": 1}, align="center")
         ], justify="center"),
         dbc.Row([
-            dbc.Col(html.H3("Fitness doporučení: ", className="text-center m-4"), align="center", style={"color": dark}, xs={"size": 8}, sm={"size": 6}, md={"size": 3}, width={"size": 3}),
-            dbc.Col(alert_card, id="one", align="center", style={"color": "white"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
-            dbc.Col(dbc.Alert(" ", color="white", className="mt-4 mb-4"), id="two", align="center", style={"color": "white"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
+            dbc.Col(html.H3("Fitness doporučení: ", className="text-center m-4"), align="center",
+                    style={"color": dark}, xs={"size": 8}, sm={"size": 6}, md={"size": 3}, width={"size": 3}),
+            dbc.Col(html.Div(children=[],id="alert_1"), align="center",
+                    style={"color": "white"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
+            dbc.Col(html.Div(children=[],id="alert_2"), align="center",
+                    style={"color": "white"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
         ], justify="center"),
         dbc.Row([
-            dbc.Col(html.Hr(style={'borderWidth': "0.3vh", "width": "100%", "backgroundColor": "#B4E1FF", "opacity": "1", "margin-bottom": 30}), width={'size': 10}),
+            dbc.Col(html.Hr(style={'borderWidth': "0.3vh", "width": "100%",
+                    "backgroundColor": "#B4E1FF", "opacity": "1", "margin-bottom": 30}), width={'size': 10}),
         ], justify="center")
     ]),
     html.Div([
@@ -274,6 +324,9 @@ index = dbc.Container([
             ),
             dbc.Col(
                 dcc.Graph(id="graph-3", figure={}, className="border border-dark"), className="m-2", width={"size": 4}, xs={"size": 10}, sm={"size": 8}, md={"size": 5}
+            ),
+            dbc.Col(
+                dcc.Graph(id="graph-4", figure={}, className="border border-dark"), className="m-2", width={"size": 4}, xs={"size": 10}, sm={"size": 8}, md={"size": 5}
             )
 
         ], className="g-0", justify="evenly")
@@ -316,7 +369,10 @@ def display_page(pathname):
 @ app.callback(Output(component_id="subname", component_property="children"),
                [dash.dependencies.Input("st-dpdn", "value"), ])
 def set_name(input_value):
+    if not input_value == None:
         return input_value
+    else:
+        return "Třída"
 
 
 @ app.callback(
@@ -327,49 +383,76 @@ def update_output_row(pathname):
     if not li.__contains__(base64.b64decode(re.split("%", pathname)[1]).decode("utf-8")):
         return None
     if li[base64.b64decode(re.split("%", pathname)[1]).decode("utf-8")].__contains__("teacher"):
-       return generate_dropdown(file1)
+        return generate_dropdown(file1)
     else:
         return None
 
 
 @ app.callback([Output("stuclass", "children"), Output("stuage", "children"), Output("stusex", "children"),
-                Output("graph-1", "figure"), Output("graph-2", "figure"), Output("graph-3", "figure"),
-                Output("steps","value"), Output("steps","label"), Output("steps","color"),
-                Output("heartrate","value"), Output("heartrate","label"), Output("heartrate","color")],
+                Output("graph-1", "figure"), Output("graph-2",
+                                                    "figure"), Output("graph-3", "figure"),
+                Output("steps", "value"), Output(
+                    "steps", "label"), Output("steps", "color"),
+                Output("heartrate", "value"), Output("heartrate", "label"), Output("heartrate", "color"),
+                Output("alert_1", "children")],
                [Input("cls-dpdn", "value"), Input("wk-dpdn", "value"), Input("st-dpdn", "value")])
 def update_card(_class, wk, stu):
-    if wk == "Distanční":
+    if not stu == None:
+        if wk == "Distanční":
+            file = file1
+        elif wk == "Prezenční":
+            file = file2
+        df = load_dataframe(file)
+        temp = df[df["ALIAS"] == stu]
+        student_age = 2022-int(temp["YoB"].unique()[0])
+        student_sex = temp["Sex"].unique()[0]
+        figs = generate_graphs(file, stu)
+        means = generate_average(file, stu)
+        steps_count = str(int(means[1])) + " kroků za den"
+        steps_percent = int(means[1]/110)
+        heartbeat_count = str(int(means[0])) + " BPM"
+        heartbeat_percent = int(means[0]/1.5)
+
+        if steps_percent < 50:
+            colorBarSteps = red
+            alertOne = generate_alerts("Průměrný počet kroků je velice slabý","danger")
+        elif steps_percent >= 50 and steps_percent < 75:
+            colorBarSteps = yellow
+            alertOne = generate_alerts("Průměrný počet kroků je podprůměrný","warning")
+        else:
+            colorBarSteps = green
+
+        if heartbeat_percent < 80:
+            colorBarHR = green
+        elif heartbeat_percent >= 80 and heartbeat_percent < 110:
+            colorBarHR = yellow
+        else:
+            colorBarHR = red
+
+        return f"Třída: 3.B", f"Věk: {student_age}", f"Pohlaví: {student_sex}", figs[0], figs[1], figs[2], steps_percent, steps_count, colorBarSteps, heartbeat_percent, heartbeat_count, colorBarHR, alertOne
+    else:
+        return "Třída: 3.B","Počet Studentů: 20","", dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+
+
+@ app.callback([Output("sleep", "value"), Output("sleep", "label"), Output("sleep", "color"), Output("graph-4", "figure")],
+               [Input("cls-dpdn", "value"), Input("wk-dpdn", "value"), Input("st-dpdn", "value")])
+def update_sleep(_class, _week, _stu):
+    if _week == "Distanční":
         file = file1
-    elif wk == "Prezenční":
+    elif _week == "Prezenční":
         file = file2
-    df = load_dataframe(file)
-    temp = df[df["ALIAS"] == stu]
-    student_age = 2022-int(temp["YoB"].unique()[0])
-    student_sex = temp["Sex"].unique()[0]
-    figs = generate_graphs(file, stu)
-    means = generate_average(file, stu)
-    steps_count = "průměrně " + str(int(means[1])) + " kroků za den"
-    steps_percent = int(means[1]/110)
-    heartbeat_count = str(int(means[0])) + " BPM"
-    heartbeat_percent = int(means[0]/1.5)
-
-    if steps_percent < 50:
-        colorBarSteps = red
-        alert_text = "Průměrný počet kroků je velmi slabý"
-    elif steps_percent >= 50 and steps_percent < 75:
-        colorBarSteps = yellow
-        alert_text = "Průměrný počet kroků je podprůměrný"
+    sleeps = daily_sleep(file, _stu)
+    piechart = generate_piechart(file, _stu)
+    sleep_val = int(np.mean(sleeps[0])/60)
+    sleep_percent = int((np.mean(sleeps[0])*10/60))
+    if sleep_percent < 50:
+        colorBarSleep = red
+    elif sleep_percent >= 50 and sleep_percent < 75:
+        colorBarSleep = yellow
     else:
-        colorBarSteps = green
-        
-    if heartbeat_percent < 80:
-        colorBarHR = green
-    elif heartbeat_percent >= 80 and heartbeat_percent < 110:
-        colorBarHR = yellow
-    else:
-        colorBarHR = red
+        colorBarSleep = green
+    return sleep_percent, f"{sleep_val} hodin za noc", colorBarSleep, piechart
 
-    return f"Třída: 3.B", f"Věk: {student_age}", f"Pohlaví: {student_sex}", figs[0], figs[1], figs[2], steps_percent, steps_count, colorBarSteps, heartbeat_percent, heartbeat_count, colorBarHR
 
 if __name__ == "__main__":
     app.run_server(debug=True)
