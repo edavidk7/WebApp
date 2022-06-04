@@ -148,18 +148,17 @@ def generate_dropdown(file):
         dbc.Col(html.H3("Choose class(es)",
                         className="mt-3 mb-3", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
                 "size": 2}, align="center", className="text-center mr-0"),
-        dbc.Col(dcc.Dropdown(id="cls-dpdn",
+        dbc.Col(dcc.Dropdown(id="cls-dpdn", value="3.B",
                              options=["3.B"]), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3"),
         dbc.Col(html.H3("Choose week",
                         className="mt-3 mb-3", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
                 "size": 2}, align="center", className="text-center mr-0"),
-        dbc.Col(dcc.Dropdown(id="wk-dpdn",
+        dbc.Col(dcc.Dropdown(id="wk-dpdn", value="Prezenční",
                              options=["Distanční", "Prezenční"]), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3"),
         dbc.Col(html.H3("Choose student(s)",
                         className="mt-3 mb-3 ", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
                 "size": 2}, align="center", className="text-center mr-0"),
-        dbc.Col(dcc.Dropdown(id="st-dpdn", options=names), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3")], justify="center"),
-
+        dbc.Col(dcc.Dropdown(id="st-dpdn", options=names, value="Band 20",), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3")], justify="center"),
 
 info_card = dbc.Card([
     dbc.Row([
@@ -240,11 +239,11 @@ index = dbc.Container([
                 #     dcc.RadioItems(id="valbar", value="%", options=[{'label': 'Procenta', 'value': '%'},
                 #                                                     {'label': 'Hodnoty', 'value': 'num'}], inputClassName="m-1", className="mt-4 mb-2", inline=False)
                 dbc.Progress(
-                    value=40, color=red, striped=True, label="4000/10000", className="mb-3", id="steps", style={"height": "40px", "font-size": "20px", "border-radius": "25px", 'margin-top': 20}),
+                    value=10, color=red, striped=True, label=" ", className="mb-3", id="steps", style={"height": "40px", "font-size": "20px", "border-radius": "25px", 'margin-top': 20}),
                 dbc.Progress(
-                    value=94, color=green, striped=True, label=f"9h/10h", className="mb-3", id="sleep", style={"height": "40px", "font-size": "20px", "border-radius": "25px"}),
+                    value=10, color=red, striped=True, label=f" ", className="mb-3", id="sleep", style={"height": "40px", "font-size": "20px", "border-radius": "25px"}),
                 dbc.Progress(
-                    value=65, color=yellow, striped=True, label="Zvýšený", className="mb-3", id="heartrate", style={"height": "40px", "font-size": "20px", "border-radius": "25px"}
+                    value=10, color=red, striped=True, label=" ", className="mb-3", id="heartrate", style={"height": "40px", "font-size": "20px", "border-radius": "25px"}
                 )], xs={"size": 9}, sm={"size": 6}, width={"size": 6}, className="text-center", align="center"),
             dbc.Col(html.Hr(style={'borderWidth': "0.3vh", "width": "100%",
                     "backgroundColor": "#B4E1FF", "opacity": "1"}), width={'size': 10}),
@@ -313,31 +312,28 @@ def display_page(pathname):
 
 
 @ app.callback(Output(component_id="subname", component_property="children"),
-               [dash.dependencies.Input('url', 'pathname'), ])
-def set_name(pathname):
-    if re.findall("\A/dashboard", pathname) == ["/dashboard"]:
-        return base64.b64decode(re.split("%", pathname)[1]).decode("utf-8")
-    else:
-        return None
+               [dash.dependencies.Input("st-dpdn", "value"), ])
+def set_name(input_value):
+        return input_value
 
 
 @ app.callback(
     Output(component_id="admin", component_property="children"),
-    Input(component_id="subname", component_property="children"),
+    Input(component_id="url", component_property="pathname"),
 )
-def update_output_row(input_children):
-    if not li.__contains__(input_children):
+def update_output_row(pathname):
+    if not li.__contains__(base64.b64decode(re.split("%", pathname)[1]).decode("utf-8")):
         return None
-    if li[input_children].__contains__("teacher"):
-        return generate_dropdown(file1)
+    if li[base64.b64decode(re.split("%", pathname)[1]).decode("utf-8")].__contains__("teacher"):
+       return generate_dropdown(file1)
     else:
         return None
 
 
 @ app.callback([Output("stuclass", "children"), Output("stuage", "children"), Output("stusex", "children"),
-                Output("graph-1", "figure"), Output("graph-2",
-                                                    "figure"), Output("graph-3", "figure"),
-                Output("steps", "value"), Output("steps", "label")],
+                Output("graph-1", "figure"), Output("graph-2", "figure"), Output("graph-3", "figure"),
+                Output("steps","value"), Output("steps","label"), Output("steps","color"),
+                Output("heartrate","value"), Output("heartrate","label"), Output("heartrate","color")],
                [Input("cls-dpdn", "value"), Input("wk-dpdn", "value"), Input("st-dpdn", "value")])
 def update_card(_class, wk, stu):
     if wk == "Distanční":
@@ -352,7 +348,22 @@ def update_card(_class, wk, stu):
     means = generate_average(file, stu)
     steps_count = int(means[1])
     steps_percent = int(means[1]/110)
-    return f"Třída: 3.B", f"Věk: {student_age}", f"Pohlaví: {student_sex}", figs[0], figs[1], figs[2], steps_percent, steps_count
+    heartbeat_count = int(means[0])
+    heartbeat_percent = int(means[0]/1.5)
+    if steps_percent < 50:
+        colorBarSteps = red
+    elif steps_percent >= 50 and steps_percent < 75:
+        colorBarSteps = yellow
+    else:
+        colorBarSteps = green
+        
+    if heartbeat_percent < 80:
+        colorBarHR = green
+    elif heartbeat_percent >= 80 and heartbeat_percent < 110:
+        colorBarHR = yellow
+    else:
+        colorBarHR = red
+    return f"Třída: 3.B", f"Věk: {student_age}", f"Pohlaví: {student_sex}", figs[0], figs[1], figs[2], steps_percent, steps_count, colorBarSteps, heartbeat_percent, heartbeat_count, colorBarHR
 
 
 if __name__ == "__main__":
