@@ -418,9 +418,10 @@ def update_card(_class, wk, stu):
             alertOne = generate_alerts("Průměrný počet kroků je velice slabý","danger")
         elif steps_percent >= 50 and steps_percent < 75:
             colorBarSteps = yellow
-            alertOne = generate_alerts("Průměrný počet kroků je podprůměrný","warning")
+            alertOne = generate_alerts("Průměrný počet kroků je dobrá","warning")
         else:
             colorBarSteps = green
+            alertOne = generate_alerts("Průměrný počet kroků je uspokojivý","success")
 
         if heartbeat_percent < 80:
             colorBarHR = green
@@ -434,7 +435,7 @@ def update_card(_class, wk, stu):
         return "Třída: 3.B","Počet Studentů: 20","", dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
 
 
-@ app.callback([Output("sleep", "value"), Output("sleep", "label"), Output("sleep", "color"), Output("graph-4", "figure")],
+@ app.callback([Output("sleep", "value"), Output("sleep", "label"), Output("sleep", "color"), Output("graph-4", "figure"), Output("alert_2", "children")],
                [Input("cls-dpdn", "value"), Input("wk-dpdn", "value"), Input("st-dpdn", "value")])
 def update_sleep(_class, _week, _stu):
     if _week == "Distanční":
@@ -447,11 +448,14 @@ def update_sleep(_class, _week, _stu):
     sleep_percent = int((np.mean(sleeps[0])*10/60))
     if sleep_percent < 50:
         colorBarSleep = red
+        alertTwo = generate_alerts("Průměrná délka spánku je velmi krátká","danger")
     elif sleep_percent >= 50 and sleep_percent < 75:
         colorBarSleep = yellow
+        alertTwo = generate_alerts("Průměrná délka spánku je dobrá","warning")
     else:
         colorBarSleep = green
-    return sleep_percent, f"{sleep_val} hodin za noc", colorBarSleep, piechart
+        alertTwo = generate_alerts("Průměrná délka spánku je uspokojivá","success")
+    return sleep_percent, f"{sleep_val} hodin za noc", colorBarSleep, piechart, alertTwo
 
 
 if __name__ == "__main__":
