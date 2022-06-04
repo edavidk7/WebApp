@@ -1,4 +1,3 @@
-from msilib.schema import Component
 import re
 import base64
 import dash
@@ -100,11 +99,11 @@ login = dbc.Container([
         dbc.Input(id="user", type="text", placeholder="Enter Username",
             class_name="alert-primary"), xs={"size": 10}, sm={"size": 8}, md={"size": 5}, width={
             "size": 5}, style={'padding': '10px', 'margin-top': '30px',
-                               'font-size': '16px', 'border-width': '3px'})], justify="center"),
+                               'font-size': '16px', 'border-width': '3px', "color":dark})], justify="center"),
     dbc.Row([dbc.Col(
             dbc.Input(id="passw", type="password", placeholder="Enter Password", className="alert-primary mt-3", valid=False, invalid=False),  xs={"size": 10}, sm={"size": 8}, md={"size": 5}, width={
                 "size": 5}, style={'padding': '10px',
-                                   'font-size': '16px', 'border-width': '3px'})], justify="center"),
+                                   'font-size': '16px', 'border-width': '3px', "color":dark})], justify="center"),
     dbc.Row([
         dbc.Col([
             dbc.Button(children="Log in", color="primary", id='verify', href='',
