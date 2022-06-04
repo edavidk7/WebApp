@@ -14,14 +14,12 @@ import plotly.graph_objs as go
 li = {'admin': ['admin', 'teacher'],
       'student': ['student']}
 
-list_of_names = ["Karel Poláček", "2", "3", "4", "5", "6"]
-
 darker = "#242F9B"
 dark = "#646FD4"
 white = "#E8F9FD"
 lighter = "#ea6c36"
 light = "#DBDFFD"
-file = "data/dbs/data_merged_cet.feather"
+file = "data/dfs/week1.feather"
 red = "#C85C5C"
 orange = "#F9975D"
 yellow = "#FBD148"
@@ -36,9 +34,11 @@ app.layout = html.Div([
     html.Div(id='page-content')
 ])
 
+
 def load_dataframe(file):
     df = pd.read_feather(file)
-    
+    return df
+
 
 def generate_values(steps, sleep, rate, freq):
     return [
@@ -49,6 +49,26 @@ def generate_values(steps, sleep, rate, freq):
         html.H4(f"{rate} tepů/min (normál 60-70)",
                 style={"height": "30px", "font-size": "25px"}, className="mt-3 mb-3")
     ]
+
+
+def generate_dropdown():
+    df = load_dataframe(file)
+    names = df["ALIAS"].unique()
+    return dbc.Row([
+        dbc.Col(html.H3("Choose class(es)",
+                        className="mt-3 mb-3", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
+                "size": 2}, align="center", className="text-center mr-0"),
+        dbc.Col(dcc.Dropdown(id="cls-dpdn", value="1",
+                             options=["1", "2"]), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3"),
+        dbc.Col(html.H3("Choose week",
+                        className="mt-3 mb-3", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
+                "size": 2}, align="center", className="text-center mr-0"),
+        dbc.Col(dcc.Dropdown(id="wk-dpdn", value="Prezenční",
+                             options=["Distanční", "Prezenční"]), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3"),
+        dbc.Col(html.H3("Choose student(s)",
+                        className="mt-3 mb-3 ", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
+                "size": 2}, align="center", className="text-center mr-0"),
+        dbc.Col(dcc.Dropdown(id="st-dpdn", value="Band 19", options=names), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3")], justify="center"),
 
 
 def generate_card(name, age, classname, sex):
@@ -63,9 +83,12 @@ info_card = dbc.Card([
         dbc.Col(
             dbc.CardBody([html.H4(children="Student Studentov", id="subname", className="card-header", style={"color": "white", "font-size": "20px"}),
                           html.Ul([
-                              html.Li(children="Class: Student's class"),
-                              html.Li(children="Age: Student's age"),
-                              html.Li(children="Gender: Student's gender"),
+                              html.Li(children="Class: Student's class",
+                                      id="stuclass"),
+                              html.Li(children="Age: Student's age",
+                                      id="stuage"),
+                              html.Li(
+                                  children="Gender: Student's gender", id="stusex"),
                           ], className="card-text", style={"color": "white", "font-size": "20px"})]))], justify="right")],
     color=dark, style={"border-radius": "25px"}
 )
@@ -79,11 +102,11 @@ login = dbc.Container([
         dbc.Input(id="user", type="text", placeholder="Enter Username",
             class_name="alert-primary"), xs={"size": 10}, sm={"size": 8}, md={"size": 5}, width={
             "size": 5}, style={'padding': '10px', 'margin-top': '30px',
-                               'font-size': '16px', 'border-width': '3px', "color":dark})], justify="center"),
+                               'font-size': '16px', 'border-width': '3px', "color": dark})], justify="center"),
     dbc.Row([dbc.Col(
             dbc.Input(id="passw", type="password", placeholder="Enter Password", className="alert-primary mt-3", valid=False, invalid=False),  xs={"size": 10}, sm={"size": 8}, md={"size": 5}, width={
                 "size": 5}, style={'padding': '10px',
-                                   'font-size': '16px', 'border-width': '3px', "color":dark})], justify="center"),
+                                   'font-size': '16px', 'border-width': '3px', "color": dark})], justify="center"),
     dbc.Row([
         dbc.Col([
             dbc.Button(children="Log in", color="primary", id='verify', href='',
@@ -113,7 +136,8 @@ index = dbc.Container([
             "backgroundColor": "#B4E1FF", "opacity": "1"}), width={'size': 10, 'offset': 1}),
     html.Div([
         dbc.Row([
-            dbc.Col(info_card, xs={"size": 12}, sm={"size": 12}, md={"size": 4}, width={"size": 4}, className="m-3", align="center"),
+            dbc.Col(info_card, xs={"size": 12}, sm={"size": 12}, md={
+                    "size": 4}, width={"size": 4}, className="m-3", align="center"),
             dbc.Col([
                 html.I(className="fa-solid fa-person-walking", style={
                        "font-size": "30px", "color": darker, 'margin-bottom': 25, 'margin-right': 30, 'margin-top': 30, 'margin-left': 20}),
@@ -141,10 +165,14 @@ index = dbc.Container([
             # ], width={"size": 1}, align="center")
         ], justify="center"),
         dbc.Row([
-            dbc.Col(html.H3("Fitness doporučení: ", className="text-center m-4"), align="center", style={"color": dark}, xs={"size": 8}, sm={"size": 6}, md={"size": 3}, width={"size": 3}),
-            dbc.Col(dbc.Alert("Velmi nízký denní průměr kroků", color=red, className="mt-4 mb-4"), align="center", style={"color": "white"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
-            dbc.Col(dbc.Alert("Mírně podprůměrná délka spánku", color=yellow, className="mt-4 mb-4"), align="center", style={"color": "white", "border-radius": "25px"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
-            dbc.Col(html.Hr(style={'borderWidth': "0.3vh", "width": "100%", "backgroundColor": "#B4E1FF", "opacity": "1", "margin-bottom":30}), width={'size': 10}),
+            dbc.Col(html.H3("Fitness doporučení: ", className="text-center m-4"), align="center",
+                    style={"color": dark}, xs={"size": 8}, sm={"size": 6}, md={"size": 3}, width={"size": 3}),
+            dbc.Col(dbc.Alert("Velmi nízký denní průměr kroků", color=red, className="mt-4 mb-4"), align="center",
+                    style={"color": "white"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
+            dbc.Col(dbc.Alert("Mírně podprůměrná délka spánku", color=yellow, className="mt-4 mb-4"), align="center", style={
+                    "color": "white", "border-radius": "25px"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
+            dbc.Col(html.Hr(style={'borderWidth': "0.3vh", "width": "100%",
+                    "backgroundColor": "#B4E1FF", "opacity": "1", "margin-bottom": 30}), width={'size': 10}),
         ], justify="center"),
     ]),
     html.Div([
@@ -172,7 +200,7 @@ index = dbc.Container([
             )
 
         ], className="g-0", justify="evenly")
-    ], style={"background":dark, "border-radius": "25px", "margin-top":10})
+    ], style={"background": dark, "border-radius": "25px", "margin-top": 10})
 ], fluid=True)
 
 
@@ -185,7 +213,7 @@ index = dbc.Container([
 def update_output(n_clicks, uname, passw):
     # if uname == '' or uname == None and passw == '' or passw == None:
     #     return "primary", dash.no_update, dash.no_update, dash.no_update, dash.no_update
-    if n_clicks>0:
+    if n_clicks > 0:
         if uname not in li:
             return "warning", dash.no_update, "Not a user", dash.no_update, dash.no_update
         if li[uname][0] == passw:
@@ -196,28 +224,11 @@ def update_output(n_clicks, uname, passw):
         return "primary", dash.no_update, "Log In", dash.no_update, dash.no_update
 
 
-# @ app.callback([Output('bars', 'children')], [Input('freqvaltype', 'value'), Input('valbar', 'value')])
-# def update_bars(freqvaltype, valbar):
-#     freq = ""
-#     if freqvaltype == "Denní průměr":
-#         freq = "denní"
-#     if freqvaltype == "Týdenní průměr":
-#         freq = "týdenní"
-#     if freqvaltype == "Hodinový průměr":
-#         freq = "hodinové"
-
-#     if valbar == "%":
-#         content = generate_progress(10000, 9, 65, freq)
-#     elif valbar == "num":
-#         content = generate_values(10000, 9, 65, freq)
-#     return [content]
-
-
 @ app.callback(dash.dependencies.Output('page-content', 'children'),
                [dash.dependencies.Input('url', 'pathname'), ])
 def display_page(pathname):
     if re.findall("\A/dashboard", pathname) == ["/dashboard"]:
-        if len(re.split("%",pathname)[1]) % 4 == 0:
+        if len(re.split("%", pathname)[1]) % 4 == 0:
             return index
         else:
             return login
@@ -245,24 +256,16 @@ def update_output_row(input_children):
         return generate_dropdown()
     else:
         return None
-    
 
-def generate_dropdown():
-    return dbc.Row([
-        dbc.Col(html.H3("Choose class(es)",
-                        className="mt-3 mb-3", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
-                "size": 2}, align="center", className="text-center mr-0"),
-        dbc.Col(dcc.Dropdown(id="cls-dpdn", value="",
-                             options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3"),
-        dbc.Col(html.H3("Choose week",
-                        className="mt-3 mb-3", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
-                "size": 2}, align="center", className="text-center mr-0"),
-        dbc.Col(dcc.Dropdown(id="cls-dpdn", value="",
-                             options=["1", "2"]), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3"),                    
-        dbc.Col(html.H3("Choose student(s)",
-                        className="mt-3 mb-3 ", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
-                "size": 2}, align="center", className="text-center mr-0"),
-        dbc.Col(dcc.Dropdown(id="cls-dpdn", value="", options=list_of_names), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3")], justify="center"),
+
+@ app.callback([Output("stuclass", "children"), Output("stuage", "children"), Output("stusex", "children")],
+               [Input("cls-dpdn", "value"), Input("wk-dpdn", "value"), Input("st-dpdn", "value")])
+def update_card(_class, wk, stu):
+    df = load_dataframe(file)
+    temp = df[df["ALIAS"] == stu]
+    student_age = 2022-int(temp["YoB"].unique()[0])
+    student_sex = temp["Sex"].unique()[0]
+    return f"Třída: {_class}", f"Věk: {student_age}", f"Pohlaví: {student_sex}"
 
 
 if __name__ == "__main__":
