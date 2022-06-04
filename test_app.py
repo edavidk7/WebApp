@@ -11,8 +11,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 li = {'admin': ['admin', 'teacher'],
       'student': ['student']}
-<<<<<<< HEAD
-=======
 
 darker = "#242F9B"
 dark = "#646FD4"
@@ -24,7 +22,6 @@ red = "#C85C5C"
 orange = "#F9975D"
 yellow = "#FBD148"
 green = "#B2EA70"
->>>>>>> 70e1845e2bada5ea73a733d83b5dc69bcedb2e03
 
 app = Dash("EduFit", external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP, dbc.icons.FONT_AWESOME], suppress_callback_exceptions=True,
            meta_tags=[{'name': 'viewport',
@@ -123,18 +120,6 @@ index = dbc.Container([
                 dbc.NavLink(children=["Log out ", html.I(className="bi bi-box-arrow-right ml-2")], href="/", active=True)], brand="EduFit", dark=True, color=dark, style={"color": "white", "font-size": "20px", "border-radius": "25px"}, class_name="mt-3", expand="sm", fluid=True), width={"size": 12})
     ], justify="center"),
     html.Div(id="admin"),
-<<<<<<< HEAD
-        #dbc.Row([
-               # dbc.Col(html.H3("Choose class(es)",
-               #     className="text-primary mt-3 mb-3", style={"font-size": "20px"}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
-               # "size": 2}, align="center", className="text-center mr-0"),
-               # dbc.Col(dcc.Dropdown(id="cls-dpdn", value="",
-               #     options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 3}, width={"size": 3}, className="mt-3 mb-3"), 
-               # dbc.Col(html.H3("Choose student(s)",
-               #     className="text-primary mt-3 mb-3 ", style={"font-size": "20px"}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
-               # "size": 2}, align="center", className="text-center mr-0"),            
-               # dbc.Col(dcc.Dropdown(id="cls-dpdn", value="", options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 3}, width={"size": 3}, className="mt-3 mb-3",)], justify="center"),
-=======
     #dbc.Row([
             #dbc.Col(html.H3("Choose class(es)",
                     #className="mt-3 mb-3", style={"font-size": "20px", "color":darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
@@ -146,7 +131,6 @@ index = dbc.Container([
                 #"size": 2}, align="center", className="text-center mr-0"),
             #dbc.Col(dcc.Dropdown(id="cls-dpdn", value="", options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 3}, width={"size": 3}, className="mt-3 mb-3")], justify="center"),
             dbc.Col(html.Hr(style={'borderWidth': "0.3vh", "width": "100%", "backgroundColor": "#B4E1FF","opacity":"1"}),width={'size':10, 'offset':1}),
->>>>>>> 70e1845e2bada5ea73a733d83b5dc69bcedb2e03
     html.Div([
         dbc.Row([
             dbc.Col(info_card, xs={"size": 12}, sm={"size": 12}, md={"size": 4}, width={"size": 4},
@@ -211,7 +195,7 @@ index = dbc.Container([
 
 
 @ app.callback(
-    [Output('verify', 'color'), Output('verify', 'href'),
+    [Output('verify', 'color'), Output('url', 'pathname'),
      Output('verify', 'children'), Output('passw', 'valid'), Output('passw', 'invalid')],
     [Input('verify', 'n_clicks')],
     [State('user', 'value'),
@@ -219,12 +203,15 @@ index = dbc.Container([
 def update_output(n_clicks, uname, passw):
     # if uname == '' or uname == None and passw == '' or passw == None:
     #     return "primary", dash.no_update, dash.no_update, dash.no_update, dash.no_update
-    if uname not in li:
-        return "warning", dash.no_update, "Not a user", dash.no_update, dash.no_update
-    if li[uname][0] == passw:
-        return "success", '/dashboard%'+base64.b64encode(uname.encode("utf-8")).decode("utf-8"), "Success!", True, False
-    if uname in li.keys() and passw != li[uname][0]:
-        return "danger", dash.no_update, "Wrong credentials", False, True
+    if n_clicks>0:
+        if uname not in li:
+            return "warning", dash.no_update, "Not a user", dash.no_update, dash.no_update
+        if li[uname][0] == passw:
+            return "success", '/dashboard%'+base64.b64encode(uname.encode("utf-8")).decode("utf-8"), "Success!", True, False
+        if uname in li.keys() and passw != li[uname][0]:
+            return "danger", dash.no_update, "Wrong credentials", False, True
+    else:
+        return "primary", dash.no_update, "Log In", dash.no_update, dash.no_update
 
 
 # @ app.callback([Output('bars', 'children')], [Input('freqvaltype', 'value'), Input('valbar', 'value')])
@@ -248,9 +235,10 @@ def update_output(n_clicks, uname, passw):
                [dash.dependencies.Input('url', 'pathname'),])    
 def display_page(pathname):
     if re.findall("\A/dashboard", pathname) == ["/dashboard"]:
-
+        if len(re.split("%",pathname)[1]) % 4 == 0:
             return index
-
+        else:
+            return login
     else:
         return login
 
@@ -276,17 +264,6 @@ def update_output_row(input_children):
 
 def generate_dropdown():
     return dbc.Row([
-<<<<<<< HEAD
-                dbc.Col(html.H3("Choose class(es)",
-                    className="text-primary mt-3 mb-3", style={"font-size": "20px"}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
-                "size": 2}, align="center", className="text-center mr-0"),
-                dbc.Col(dcc.Dropdown(id="cls-dpdn", value="",
-                    options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 3}, width={"size": 3}, className="mt-3 mb-3"), 
-                dbc.Col(html.H3("Choose student(s)",
-                    className="text-primary mt-3 mb-3 ", style={"font-size": "20px"}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
-                "size": 2}, align="center", className="text-center mr-0"),            
-                dbc.Col(dcc.Dropdown(id="cls-dpdn", value="", options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 3}, width={"size": 3}, className="mt-3 mb-3",)], justify="center"),
-=======
             dbc.Col(html.H3("Choose class(es)",
                     className="mt-3 mb-3", style={"font-size": "20px", "color":darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
                 "size": 2}, align="center", className="text-center mr-0"),
@@ -297,7 +274,6 @@ def generate_dropdown():
                 "size": 2}, align="center", className="text-center mr-0"),
             dbc.Col(dcc.Dropdown(id="cls-dpdn", value="", options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 3}, width={"size": 3}, className="mt-3 mb-3")], justify="center"),
            
->>>>>>> 70e1845e2bada5ea73a733d83b5dc69bcedb2e03
 
 if __name__ == "__main__":
     app.run_server(debug=True)
