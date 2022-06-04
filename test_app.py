@@ -11,6 +11,20 @@ import plotly.express as px
 import plotly.graph_objects as go
 li = {'admin': ['admin', 'teacher'],
       'student': ['student']}
+<<<<<<< HEAD
+=======
+
+darker = "#242F9B"
+dark = "#646FD4"
+white = "#E8F9FD"
+lighter = "#ea6c36"
+light = "#DBDFFD"
+
+red = "#C85C5C"
+orange = "#F9975D"
+yellow = "#FBD148"
+green = "#B2EA70"
+>>>>>>> 70e1845e2bada5ea73a733d83b5dc69bcedb2e03
 
 app = Dash("EduFit", external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP, dbc.icons.FONT_AWESOME], suppress_callback_exceptions=True,
            meta_tags=[{'name': 'viewport',
@@ -69,22 +83,22 @@ def generate_card(name, age, classname, sex):
 info_card = dbc.Card([
     dbc.Row([
         dbc.Col(
-            dbc.CardBody(html.I(className="bi bi-person-square card-text", style={"font-size": "80px"}), className=""), width={"size": 3}, align="center"
+            dbc.CardBody(html.I(className="fa-solid fa-person", style={"font-size": "40px", "color": "white"}), className=""), width={"size": 2}, align="top"
         ),
         dbc.Col(
-            dbc.CardBody([html.H4(children="Student Studentov", id="subname", className="card-title"),
+            dbc.CardBody([html.H4(children="Student Studentov", id="subname", className="card-header", style={"color": "white", "font-size": "20px"}),
                           html.Ul([
                               html.Li(children="Class: Student's class"),
-                              html.Li(children="Age: Student's age")
-                          ], className="card-text")]), width={"size": 7})], justify="center")],
-    color="dark", outline=True
+                              html.Li(children="Age: Student's age"),
+                              html.Li(children="Gender: Student's gender"),
+                          ], className="card-text", style={"color": "white", "font-size": "20px"})]))], justify="right")],
+    color=dark, style={"border-radius": "25px"}
 )
 
 login = dbc.Container([
-    dbc.Row([dbc.Col(html.H1("EduFit: Student fitness tracker", className="text-primary"), xs={"size": 12}, sm={"size": 12}, md={"size": 8}, width={"size": 6})],
-            style={'margin-top': '100px', "font-size": "30px", "text-align": "center"}, justify="center"),
-    dbc.Row([dbc.Col(html.I(className="bi bi-person-circle text-primary"), xs={"size": 6}, sm={"size": 4}, md={"size": 2}, width={
-            "size": 1}, className="text-center", style={'margin-top': '10px', "font-size": "100px"})], justify="center"),
+    dbc.Row([dbc.Col(html.H1("EduFit: Student fitness tracker", className=""), xs={"size": 12}, sm={"size": 12}, md={"size": 8}, width={"size": 6})],
+            style={'margin-top': '100px', "font-size": "30px", "text-align": "center", "color":darker}, justify="center"),
+    dbc.Row([dbc.Col(html.Div(html.Img(src="/static/images/logo.png")))], style={'textAlign': 'center'}, justify="center"),
     dbc.Row([dbc.Col(
         dbc.Input(id="user", type="text", placeholder="Enter Username",
             class_name="alert-primary"), xs={"size": 10}, sm={"size": 8}, md={"size": 5}, width={
@@ -106,9 +120,10 @@ index = dbc.Container([
     dbc.Row([
         dbc.Col(
             dbc.NavbarSimple(children=[
-                dbc.NavLink(children=["Log out ", html.I(className="bi bi-box-arrow-right ml-2")], href="/", active=True)], brand="EduFit", dark=True, color="primary", style={"color": "white", "font-size": "20px", "border-radius": "5px"}, class_name="mt-3", expand="sm", fluid=True), width={"size": 12})
+                dbc.NavLink(children=["Log out ", html.I(className="bi bi-box-arrow-right ml-2")], href="/", active=True)], brand="EduFit", dark=True, color=dark, style={"color": "white", "font-size": "20px", "border-radius": "25px"}, class_name="mt-3", expand="sm", fluid=True), width={"size": 12})
     ], justify="center"),
     html.Div(id="admin"),
+<<<<<<< HEAD
         #dbc.Row([
                # dbc.Col(html.H3("Choose class(es)",
                #     className="text-primary mt-3 mb-3", style={"font-size": "20px"}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
@@ -119,18 +134,28 @@ index = dbc.Container([
                #     className="text-primary mt-3 mb-3 ", style={"font-size": "20px"}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
                # "size": 2}, align="center", className="text-center mr-0"),            
                # dbc.Col(dcc.Dropdown(id="cls-dpdn", value="", options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 3}, width={"size": 3}, className="mt-3 mb-3",)], justify="center"),
+=======
+    #dbc.Row([
+            #dbc.Col(html.H3("Choose class(es)",
+                    #className="mt-3 mb-3", style={"font-size": "20px", "color":darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
+                #"size": 2}, align="center", className="text-center mr-0"),
+            #dbc.Col(dcc.Dropdown(id="cls-dpdn", value="",
+                    #options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 3}, width={"size": 3}, className="mt-3 mb-3"),
+            #dbc.Col(html.H3("Choose student(s)",
+                    #className="mt-3 mb-3 ", style={"font-size": "20px", "color":darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
+                #"size": 2}, align="center", className="text-center mr-0"),
+            #dbc.Col(dcc.Dropdown(id="cls-dpdn", value="", options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 3}, width={"size": 3}, className="mt-3 mb-3")], justify="center"),
+            dbc.Col(html.Hr(style={'borderWidth': "0.3vh", "width": "100%", "backgroundColor": "#B4E1FF","opacity":"1"}),width={'size':10, 'offset':1}),
+>>>>>>> 70e1845e2bada5ea73a733d83b5dc69bcedb2e03
     html.Div([
         dbc.Row([
-            dbc.Col(info_card, xs={"size": 12}, sm={"size": 8}, md={"size": 4}, width={"size": 4},
+            dbc.Col(info_card, xs={"size": 12}, sm={"size": 12}, md={"size": 4}, width={"size": 4},
                     className="m-3", align="center"),
             dbc.Col([
-                html.H3("Kroky",
-                    className="text-primary mt-4 mb-4", style={"font-size": "20px"}),
-                html.H3("Spánek",
-                    className="text-primary mb-4", style={"font-size": "20px"}),
-                html.H3("Tep",
-                    className="text-primary mb-4", style={"font-size": "20px"})
-            ], xs={"size": 2}, sm={"size": 1}, md={"size": 1}, width={"size": 1}, align="center"),
+                html.I(className="fa-solid fa-person-walking", style={"font-size": "30px", "color":darker, 'margin-bottom':25, 'margin-right':30, 'margin-top':30, 'margin-left':20}),
+                html.I(className="fa-solid fa-bed", style={"font-size": "30px", "color":darker, 'margin-bottom':25, 'margin-right':30, 'margin-left':10}),
+                html.I(className="fa-solid fa-heart-circle-check", style={"font-size": "30px", "color":darker, 'margin-bottom':30, 'margin-right':30, 'margin-left':10})
+            ], xs={"size": 3}, sm={"size": 1}, md={"size": 1}, width={"size": 1}, align="center"),
             dbc.Col([
                 # dcc.RadioItems(id="freqvaltype", value="Denní průměr", options=[
                 #     "Týdenní průměr", "Denní průměr", "Hodinový průměr"], labelClassName="m-1", inputClassName="m-1", inline=True),
@@ -139,26 +164,25 @@ index = dbc.Container([
                 #     dcc.RadioItems(id="valbar", value="%", options=[{'label': 'Procenta', 'value': '%'},
                 #                                                     {'label': 'Hodnoty', 'value': 'num'}], inputClassName="m-1", className="mt-4 mb-2", inline=False)
                 dbc.Progress(
-                    value=79, label="79 % doporučené denní hodnoty", className="mt-3 mb-3", style={"height": "30px", "font-size": "20px"}),
+                    value=40, color=red, striped=True, label="4000/10000", className="mb-3", style={"height": "40px", "font-size": "20px", "border-radius": "25px", 'margin-top':20}),
                 dbc.Progress(
-                    value=94, label=f"94 % doporučené denní hodnoty", className="mt-3 mb-3", style={"height": "30px", "font-size": "20px"}),
+                    value=94, color=green, striped=True, label=f"9h/10h", className="mb-3", style={"height": "40px", "font-size": "20px", "border-radius": "25px"}),
                 dbc.Progress(
-                    value=65, label="Normální", className="mt-3 mb-3", style={"height": "30px", "font-size": "20px"},
-                    color="success")], xs={"size": 10}, sm={"size": 6}, width={"size": 6}, className="text-center", align="center")
-
+                    value=65, color=yellow, striped=True, label="Zvýšený", className="mb-3", style={"height": "40px", "font-size": "20px", "border-radius": "25px"}
+                    )], xs={"size": 9}, sm={"size": 6}, width={"size": 6}, className="text-center", align="center"),
+            dbc.Col(html.Hr(style={'borderWidth': "0.3vh", "width": "100%", "backgroundColor": "#B4E1FF","opacity":"1"}),width={'size':10}),
             # ], width={"size": 1}, align="center")
         ], justify="center"),
         dbc.Row([
             dbc.Col(
-                html.H3("Fitness doporučení: ", className="text-primary text-center m-4"), width={"size": 3}, align="center"
+                html.H3("Fitness doporučení: ", className="text-center m-4"), align="center", style={"color":dark}, xs={"size": 8}, sm={"size": 6}, md={"size": 4}, width={"size": 4}
+            ),
+            dbc.Col(dbc.Alert("Velmi nízký denní průměr kroků", color=red, className="mt-4 mb-4"), align="center", style={"color":"white"}, xs={"size": 8}, sm={"size": 6}, md={"size": 4}, width={"size": 4}
             ),
             dbc.Col(
-                dbc.Alert("Doporučení 1", color="success", className="mt-4 mb-4"), align="center", width={"size": 4}
-            ),
-            dbc.Col(
-                dbc.Alert("Doporučení 2", color="primary", className="mt-4 mb-4"), align="center", width={"size": 4}
+                dbc.Alert("Mírně podprůměrná délka spánku", color=yellow, className="mt-4 mb-4"), align="center", style={"color":"white", "border-radius": "25px"}, xs={"size": 8}, sm={"size": 6}, md={"size": 4}, width={"size": 4}
             )
-        ], justify="start"),
+        ], justify="center"),
 
         dbc.Row([
             dbc.Col(
@@ -182,7 +206,7 @@ index = dbc.Container([
             )
 
         ], className="g-0", justify="evenly")
-    ], style={"background": "gainsboro", "border-radius": "5px"})
+    ], style={"background":"white", "border-radius": "25px"})
 ], fluid=True)
 
 
@@ -252,6 +276,7 @@ def update_output_row(input_children):
 
 def generate_dropdown():
     return dbc.Row([
+<<<<<<< HEAD
                 dbc.Col(html.H3("Choose class(es)",
                     className="text-primary mt-3 mb-3", style={"font-size": "20px"}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
                 "size": 2}, align="center", className="text-center mr-0"),
@@ -261,6 +286,18 @@ def generate_dropdown():
                     className="text-primary mt-3 mb-3 ", style={"font-size": "20px"}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
                 "size": 2}, align="center", className="text-center mr-0"),            
                 dbc.Col(dcc.Dropdown(id="cls-dpdn", value="", options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 3}, width={"size": 3}, className="mt-3 mb-3",)], justify="center"),
+=======
+            dbc.Col(html.H3("Choose class(es)",
+                    className="mt-3 mb-3", style={"font-size": "20px", "color":darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
+                "size": 2}, align="center", className="text-center mr-0"),
+            dbc.Col(dcc.Dropdown(id="cls-dpdn", value="",
+                    options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 3}, width={"size": 3}, className="mt-3 mb-3"),
+            dbc.Col(html.H3("Choose student(s)",
+                    className="mt-3 mb-3 ", style={"font-size": "20px", "color":darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
+                "size": 2}, align="center", className="text-center mr-0"),
+            dbc.Col(dcc.Dropdown(id="cls-dpdn", value="", options=["1", "2", "3", "4", "5", "6"]), xs={"size": 7}, sm={"size": 5}, md={"size": 3}, width={"size": 3}, className="mt-3 mb-3")], justify="center"),
+           
+>>>>>>> 70e1845e2bada5ea73a733d83b5dc69bcedb2e03
 
 if __name__ == "__main__":
     app.run_server(debug=True)
