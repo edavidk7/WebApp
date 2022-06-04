@@ -134,8 +134,7 @@ index = dbc.Container([
             "backgroundColor": "#B4E1FF", "opacity": "1"}), width={'size': 10, 'offset': 1}),
     html.Div([
         dbc.Row([
-            dbc.Col(info_card, xs={"size": 12}, sm={"size": 12}, md={"size": 4}, width={"size": 4},
-                    className="m-3", align="center"),
+            dbc.Col(info_card, xs={"size": 12}, sm={"size": 12}, md={"size": 4}, width={"size": 4}, className="m-3", align="center"),
             dbc.Col([
                 html.I(className="fa-solid fa-person-walking", style={
                        "font-size": "30px", "color": darker, 'margin-bottom': 25, 'margin-right': 30, 'margin-top': 30, 'margin-left': 20}),
@@ -163,16 +162,15 @@ index = dbc.Container([
             # ], width={"size": 1}, align="center")
         ], justify="center"),
         dbc.Row([
-            dbc.Col(
-                html.H3("Fitness doporučení: ", className="text-center m-4"), align="center", style={"color": dark}, xs={"size": 8}, sm={"size": 6}, md={"size": 4}, width={"size": 4}
-            ),
-            dbc.Col(dbc.Alert("Velmi nízký denní průměr kroků", color=red, className="mt-4 mb-4"), align="center", style={"color": "white"}, xs={"size": 8}, sm={"size": 6}, md={"size": 4}, width={"size": 4}
-                    ),
-            dbc.Col(
-                dbc.Alert("Mírně podprůměrná délka spánku", color=yellow, className="mt-4 mb-4"), align="center", style={"color": "white", "border-radius": "25px"}, xs={"size": 8}, sm={"size": 6}, md={"size": 4}, width={"size": 4}
-            )
+            dbc.Col(html.H3("Fitness doporučení: ", className="text-center m-4"), align="center", style={"color": dark}, xs={"size": 8}, sm={"size": 6}, md={"size": 3}, width={"size": 3}),
+            dbc.Col(dbc.Alert("Velmi nízký denní průměr kroků", color=red, className="mt-4 mb-4"), align="center", style={"color": "white"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
+            dbc.Col(dbc.Alert("Mírně podprůměrná délka spánku", color=yellow, className="mt-4 mb-4"), align="center", style={"color": "white", "border-radius": "25px"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
+            dbc.Col(html.Hr(style={'borderWidth': "0.3vh", "width": "100%", "backgroundColor": "#B4E1FF", "opacity": "1", "margin-bottom":30}), width={'size': 10}),
         ], justify="center"),
-
+    ]),
+    html.Div([
+        dbc.Row([dbc.Col(html.H1(" "))]),
+        dbc.Row([dbc.Col(html.H1(" "))]),
         dbc.Row([
             dbc.Col(
                 dcc.Graph(id="stepgraph", figure={
@@ -185,17 +183,17 @@ index = dbc.Container([
                     'layout': {
                         'title': 'Dash Data Visualization'
                     }
-                }, className="border border-dark"), className="m-2", width={"size": 4}
+                }, className="border border-dark"), className="m-2", width={"size": 4}, xs={"size": 10}, sm={"size": 8}, md={"size": 5}
             ),
             dbc.Col(
-                dcc.Graph(id="sleepgraph", figure={}, className="border border-dark"), className="m-2", width={"size": 4}
+                dcc.Graph(id="sleepgraph", figure={}, className="border border-dark"), className="m-2", width={"size": 4}, xs={"size": 10}, sm={"size": 8}, md={"size": 5}
             ),
             dbc.Col(
-                dcc.Graph(id="rategraph", figure={}, className="border border-dark"), className="m-2", width={"size": 4}
+                dcc.Graph(id="rategraph", figure={}, className="border border-dark"), className="m-2", width={"size": 4}, xs={"size": 10}, sm={"size": 8}, md={"size": 5}
             )
 
         ], className="g-0", justify="evenly")
-    ], style={"background": "white", "border-radius": "25px"})
+    ], style={"background":dark, "border-radius": "25px", "margin-top":10})
 ], fluid=True)
 
 
