@@ -12,7 +12,28 @@ from plotly.io import write_image
 import plotly.graph_objs as go
 
 li = {'admin': ['admin', 'teacher'],
-      'student': ['student']}
+        'Band 03': ['Band 03'],
+        'Band 04': ['Band 04'],
+        'Band 05': ['Band 05'],
+        'Band 06': ['Band 06'],
+        'Band 07': ['Band 07'],
+        'Band 08': ['Band 08'],
+        'Band 09': ['Band 09'],
+        'Band 10': ['Band 10'],
+        'Band 11': ['Band 11'],
+        'Band 12': ['Band 12'],
+        'Band 13': ['Band 13'],
+        'Band 14': ['Band 14'],
+        'Band 15': ['Band 15'],
+        'Band 16': ['Band 16'],
+        'Band 17': ['Band 17'],
+        'Band 18': ['Band 18'],
+        'Band 19': ['Band 19'],
+        'Band 20': ['Band 20'],
+        'Band 21': ['Band 21'],
+        'Band 22': ['Band 22'],
+        'Band 23': ['Band 23'],        
+      }
 
 darker = "#242F9B"
 dark = "#646FD4"
@@ -223,6 +244,15 @@ def update_output(n_clicks, uname, passw):
     else:
         return "primary", dash.no_update, "Log In", dash.no_update, dash.no_update
 
+@ app.callback(
+    [State('user', 'value'),
+     State('passw', 'value')], prevent_initial_call=True)
+def update_card2(_class, wk, stu):
+    df = load_dataframe(file)
+    temp = df[df["ALIAS"] == stu]
+    student_age = 2022-int(temp["YoB"].unique()[0])
+    student_sex = temp["Sex"].unique()[0]
+    return f"Třída: {_class}", f"Věk: {student_age}", f"Pohlaví: {student_sex}"
 
 @ app.callback(dash.dependencies.Output('page-content', 'children'),
                [dash.dependencies.Input('url', 'pathname'), ])
@@ -266,7 +296,6 @@ def update_card(_class, wk, stu):
     student_age = 2022-int(temp["YoB"].unique()[0])
     student_sex = temp["Sex"].unique()[0]
     return f"Třída: {_class}", f"Věk: {student_age}", f"Pohlaví: {student_sex}"
-
 
 if __name__ == "__main__":
     app.run_server(debug=True)
