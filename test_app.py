@@ -125,7 +125,7 @@ index = dbc.Container([
                 #     dcc.RadioItems(id="valbar", value="%", options=[{'label': 'Procenta', 'value': '%'},
                 #                                                     {'label': 'Hodnoty', 'value': 'num'}], inputClassName="m-1", className="mt-4 mb-2", inline=False)
                 dbc.Progress(
-                    value=40, color=red, striped=True, label="4000/10000", className="mb-3", style={"height": "40px", "font-size": "20px", "border-radius": "25px", 'margin-top': 20}),
+                    value=40, color=red, striped=True, label="4000/10000", className="mb-3", id="step", style={"height": "40px", "font-size": "20px", "border-radius": "25px", 'margin-top': 20}),
                 dbc.Progress(
                     value=94, color=green, striped=True, label=f"9h/10h", className="mb-3", style={"height": "40px", "font-size": "20px", "border-radius": "25px"}),
                 dbc.Progress(
@@ -240,7 +240,7 @@ def update_output_row(input_children):
         return generate_dropdown()
     else:
         return None
-
+    
 
 def generate_dropdown():
     return dbc.Row([
