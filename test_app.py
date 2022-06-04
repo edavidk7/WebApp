@@ -45,6 +45,8 @@ app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
 ])
+
+
 def generate_average(file, stu):
     df = load_dataframe(file)
     df_person = df[df["ALIAS"] == stu]
@@ -71,6 +73,7 @@ def generate_average(file, stu):
         ys3.append(total_heart_rate/valid_entries["HEART_RATE"].count())
     ys3 = sum(ys3)/7
     return ys3, ys2
+
 
 def generate_graphs(file, stu):
     df = load_dataframe(file)
@@ -332,8 +335,9 @@ def update_output_row(input_children):
 
 
 @ app.callback([Output("stuclass", "children"), Output("stuage", "children"), Output("stusex", "children"),
-                Output("graph-1", "figure"), Output("graph-2", "figure"), Output("graph-3", "figure"),
-                Output("steps","value"), Output("steps","label")],
+                Output("graph-1", "figure"), Output("graph-2",
+                                                    "figure"), Output("graph-3", "figure"),
+                Output("steps", "value"), Output("steps", "label")],
                [Input("cls-dpdn", "value"), Input("wk-dpdn", "value"), Input("st-dpdn", "value")])
 def update_card(_class, wk, stu):
     if wk == "Distanční":
