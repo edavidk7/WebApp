@@ -363,7 +363,10 @@ def display_page(pathname):
 @ app.callback(Output(component_id="subname", component_property="children"),
                [dash.dependencies.Input("st-dpdn", "value"), ])
 def set_name(input_value):
-    return input_value
+    if not input_value == None:
+        return input_value
+    else:
+        return "Třída"
 
 
 @ app.callback(
@@ -387,36 +390,39 @@ def update_output_row(pathname):
                 Output("heartrate", "value"), Output("heartrate", "label"), Output("heartrate", "color")],
                [Input("cls-dpdn", "value"), Input("wk-dpdn", "value"), Input("st-dpdn", "value")])
 def update_card(_class, wk, stu):
-    if wk == "Distanční":
-        file = file1
-    elif wk == "Prezenční":
-        file = file2
-    df = load_dataframe(file)
-    temp = df[df["ALIAS"] == stu]
-    student_age = 2022-int(temp["YoB"].unique()[0])
-    student_sex = temp["Sex"].unique()[0]
-    figs = generate_graphs(file, stu)
-    means = generate_average(file, stu)
-    steps_count = str(int(means[1])) + " kroků za den"
-    steps_percent = int(means[1]/110)
-    heartbeat_count = str(int(means[0])) + " BPM"
-    heartbeat_percent = int(means[0]/1.5)
+    if not stu == None:
+        if wk == "Distanční":
+            file = file1
+        elif wk == "Prezenční":
+            file = file2
+        df = load_dataframe(file)
+        temp = df[df["ALIAS"] == stu]
+        student_age = 2022-int(temp["YoB"].unique()[0])
+        student_sex = temp["Sex"].unique()[0]
+        figs = generate_graphs(file, stu)
+        means = generate_average(file, stu)
+        steps_count = str(int(means[1])) + " kroků za den"
+        steps_percent = int(means[1]/110)
+        heartbeat_count = str(int(means[0])) + " BPM"
+        heartbeat_percent = int(means[0]/1.5)
 
-    if steps_percent < 50:
-        colorBarSteps = red
-    elif steps_percent >= 50 and steps_percent < 75:
-        colorBarSteps = yellow
+        if steps_percent < 50:
+            colorBarSteps = red
+        elif steps_percent >= 50 and steps_percent < 75:
+            colorBarSteps = yellow
+        else:
+            colorBarSteps = green
+
+        if heartbeat_percent < 80:
+            colorBarHR = green
+        elif heartbeat_percent >= 80 and heartbeat_percent < 110:
+            colorBarHR = yellow
+        else:
+            colorBarHR = red
+
+        return f"Třída: 3.B", f"Věk: {student_age}", f"Pohlaví: {student_sex}", figs[0], figs[1], figs[2], steps_percent, steps_count, colorBarSteps, heartbeat_percent, heartbeat_count, colorBarHR
     else:
-        colorBarSteps = green
-
-    if heartbeat_percent < 80:
-        colorBarHR = green
-    elif heartbeat_percent >= 80 and heartbeat_percent < 110:
-        colorBarHR = yellow
-    else:
-        colorBarHR = red
-
-    return f"Třída: 3.B", f"Věk: {student_age}", f"Pohlaví: {student_sex}", figs[0], figs[1], figs[2], steps_percent, steps_count, colorBarSteps, heartbeat_percent, heartbeat_count, colorBarHR
+        return "Třída: 3.B","Počet Studentů: 20","", dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
 
 
 @ app.callback([Output("sleep", "value"), Output("sleep", "label"), Output("sleep", "color"), Output("graph-4", "figure")],
