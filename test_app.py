@@ -31,11 +31,10 @@ lighter = "#ea6c36"
 light = "#DBDFFD"
 file1 = "data/dfs/week1.feather"
 file2 = "data/dfs/week2.feather"
-red = "#C85C5C"
+red = "danger"
 orange = "#F9975D"
-yellow = "#FBD148"
-green = "#B2EA70"
-prumer_kroky_list = []
+yellow = "warning"
+green = "success"
 
 app = Dash("EduFit", external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP, dbc.icons.FONT_AWESOME], suppress_callback_exceptions=True,
            meta_tags=[{'name': 'viewport',
@@ -91,7 +90,7 @@ def generate_graphs(file, stu):
         xs.append(weekday)
         ys.append(max_heart_rate)
 
-    fig1 = px.bar(x=xs, y=ys, title="Maximum heart rate", text_auto=True)
+    fig1 = px.bar(x=xs, y=ys, title="Maximální srdeční tep", text_auto=True)
     xs = []
     ys = []
     for weekday in df["WEEK_DAY"].unique():
@@ -100,7 +99,7 @@ def generate_graphs(file, stu):
         xs.append(weekday)
         ys.append(total_steps)
 
-    fig2 = px.bar(x=xs, y=ys, title="Daily steps")
+    fig2 = px.bar(x=xs, y=ys, title="Denní kroky")
     xs = []
     ys = []
 
@@ -120,7 +119,7 @@ def generate_graphs(file, stu):
         xs.append(weekday)
         ys.append(total_heart_rate/valid_entries["HEART_RATE"].count())
 
-    fig3 = px.bar(x=xs, y=ys, title="Average heart rate", text_auto=True)
+    fig3 = px.bar(x=xs, y=ys, title="Průměrný srdeční tep", text_auto=True)
 
     return fig1, fig2, fig3
 
@@ -145,20 +144,21 @@ def generate_dropdown(file):
     df = load_dataframe(file)
     names = df["ALIAS"].unique()
     return dbc.Row([
-        dbc.Col(html.H3("Choose class(es)",
+        dbc.Col(html.H3("Výběr třídy",
                         className="mt-3 mb-3", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
                 "size": 2}, align="center", className="text-center mr-0"),
         dbc.Col(dcc.Dropdown(id="cls-dpdn", value="3.B",
                              options=["3.B"]), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3"),
-        dbc.Col(html.H3("Choose week",
+        dbc.Col(html.H3("Výběr týdne",
                         className="mt-3 mb-3", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
                 "size": 2}, align="center", className="text-center mr-0"),
         dbc.Col(dcc.Dropdown(id="wk-dpdn", value="Prezenční",
                              options=["Distanční", "Prezenční"]), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3"),
-        dbc.Col(html.H3("Choose student(s)",
+        dbc.Col(html.H3("Výběr studenta",
                         className="mt-3 mb-3 ", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
                 "size": 2}, align="center", className="text-center mr-0"),
         dbc.Col(dcc.Dropdown(id="st-dpdn", options=names, value="Band 20",), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3")], justify="center"),
+
 
 info_card = dbc.Card([
     dbc.Row([
@@ -204,7 +204,7 @@ index = dbc.Container([
     dbc.Row([
         dbc.Col(
             dbc.NavbarSimple(children=[
-                dbc.NavLink(children=["Log out ", html.I(className="bi bi-box-arrow-right ml-2")], href="/", active=True)], brand="EduFit", dark=True, color=dark, style={"color": "white", "font-size": "20px", "border-radius": "25px"}, class_name="mt-3", expand="sm", fluid=True), width={"size": 12})
+                dbc.NavLink(children=["Odhlásit se ", html.I(className="bi bi-box-arrow-right ml-2")], href="/", active=True)], brand="EduFit", dark=True, color=dark, style={"color": "white", "font-size": "20px", "border-radius": "25px"}, class_name="mt-3", expand="sm", fluid=True), width={"size": 12})
     ], justify="center"),
     html.Div(id="admin"),
     # dbc.Row([
@@ -241,7 +241,7 @@ index = dbc.Container([
                 dbc.Progress(
                     value=10, color=red, striped=True, label=" ", className="mb-3", id="steps", style={"height": "40px", "font-size": "20px", "border-radius": "25px", 'margin-top': 20}),
                 dbc.Progress(
-                    value=10, color=red, striped=True, label=f" ", className="mb-3", id="sleep", style={"height": "40px", "font-size": "20px", "border-radius": "25px"}),
+                    value=10, color=red, striped=True, label=" ", className="mb-3", id="sleep", style={"height": "40px", "font-size": "20px", "border-radius": "25px"}),
                 dbc.Progress(
                     value=10, color=red, striped=True, label=" ", className="mb-3", id="heartrate", style={"height": "40px", "font-size": "20px", "border-radius": "25px"}
                 )], xs={"size": 9}, sm={"size": 6}, width={"size": 6}, className="text-center", align="center"),
@@ -250,15 +250,13 @@ index = dbc.Container([
             # ], width={"size": 1}, align="center")
         ], justify="center"),
         dbc.Row([
-            dbc.Col(html.H3("Fitness doporučení: ", className="text-center m-4"), align="center",
-                    style={"color": dark}, xs={"size": 8}, sm={"size": 6}, md={"size": 3}, width={"size": 3}),
-            dbc.Col(dbc.Alert("Velmi nízký denní průměr kroků", color=red, className="mt-4 mb-4"), align="center",
-                    style={"color": "white"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
-            dbc.Col(dbc.Alert("Mírně podprůměrná délka spánku", color=yellow, className="mt-4 mb-4"), align="center", style={
-                    "color": "white", "border-radius": "25px"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
-            dbc.Col(html.Hr(style={'borderWidth': "0.3vh", "width": "100%",
-                    "backgroundColor": "#B4E1FF", "opacity": "1", "margin-bottom": 30}), width={'size': 10}),
+            dbc.Col(html.H3("Fitness doporučení: ", className="text-center m-4"), align="center", style={"color": dark}, xs={"size": 8}, sm={"size": 6}, md={"size": 3}, width={"size": 3}),
+            dbc.Col(dbc.Alert(" ", color="white", className="mt-4 mb-4"), id="one", align="center", style={"color": "white"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
+            dbc.Col(dbc.Alert(" ", color="white", className="mt-4 mb-4"), id="two", align="center", style={"color": "white"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
         ], justify="center"),
+        dbc.Row([
+            dbc.Col(html.Hr(style={'borderWidth': "0.3vh", "width": "100%", "backgroundColor": "#B4E1FF", "opacity": "1", "margin-bottom": 30}), width={'size': 10}),
+        ], justify="center")
     ]),
     html.Div([
         dbc.Row([dbc.Col(html.H1(""))]),
@@ -328,15 +326,17 @@ def update_output_row(pathname):
     if not li.__contains__(base64.b64decode(re.split("%", pathname)[1]).decode("utf-8")):
         return None
     if li[base64.b64decode(re.split("%", pathname)[1]).decode("utf-8")].__contains__("teacher"):
-       return generate_dropdown(file1)
+        return generate_dropdown(file1)
     else:
         return None
 
 
 @ app.callback([Output("stuclass", "children"), Output("stuage", "children"), Output("stusex", "children"),
-                Output("graph-1", "figure"), Output("graph-2", "figure"), Output("graph-3", "figure"),
-                Output("steps","value"), Output("steps","label"), Output("steps","color"),
-                Output("heartrate","value"), Output("heartrate","label"), Output("heartrate","color")],
+                Output("graph-1", "figure"), Output("graph-2",
+                                                    "figure"), Output("graph-3", "figure"),
+                Output("steps", "value"), Output(
+                    "steps", "label"), Output("steps", "color"),
+                Output("heartrate", "value"), Output("heartrate", "label"), Output("heartrate", "color")],
                [Input("cls-dpdn", "value"), Input("wk-dpdn", "value"), Input("st-dpdn", "value")])
 def update_card(_class, wk, stu):
     if not stu == None:
@@ -350,23 +350,25 @@ def update_card(_class, wk, stu):
         student_sex = temp["Sex"].unique()[0]
         figs = generate_graphs(file, stu)
         means = generate_average(file, stu)
-        steps_count = int(means[1])
+        steps_count = str(int(means[1])) + " kroků za den"
         steps_percent = int(means[1]/110)
-        heartbeat_count = int(means[0])
+        heartbeat_count = str(int(means[0])) + " BPM"
         heartbeat_percent = int(means[0]/1.5)
+
         if steps_percent < 50:
             colorBarSteps = red
         elif steps_percent >= 50 and steps_percent < 75:
             colorBarSteps = yellow
         else:
             colorBarSteps = green
-            
+
         if heartbeat_percent < 80:
             colorBarHR = green
         elif heartbeat_percent >= 80 and heartbeat_percent < 110:
             colorBarHR = yellow
         else:
             colorBarHR = red
+
         return f"Třída: 3.B", f"Věk: {student_age}", f"Pohlaví: {student_sex}", figs[0], figs[1], figs[2], steps_percent, steps_count, colorBarSteps, heartbeat_percent, heartbeat_count, colorBarHR
     else:
         return "Třída: 3.B","Počet Studentů: 20","", dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
