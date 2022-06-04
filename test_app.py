@@ -1,6 +1,7 @@
 import datetime as dt
 import re
 import base64
+from turtle import color
 import dash
 import dash_bootstrap_components as dbc
 import dash_daq as daq
@@ -37,6 +38,7 @@ red = "danger"
 orange = "#F9975D"
 yellow = "warning"
 green = "success"
+alert_text = " "
 
 app = Dash("EduFit", external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP, dbc.icons.FONT_AWESOME], suppress_callback_exceptions=True,
            meta_tags=[{'name': 'viewport',
@@ -201,8 +203,12 @@ def generate_dropdown(file):
         dbc.Col(html.H3("Výběr studenta",
                         className="mt-3 mb-3 ", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
                 "size": 2}, align="center", className="text-center mr-0"),
+       
         dbc.Col(dcc.Dropdown(id="st-dpdn", options=names, value="Band 20",), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3")], justify="center"),
 
+def generate_alerts(alert1,color1):
+    return  dbc.Alert(alert1,color=color1, class_name="mt-4 mb-4")
+    
 
 info_card = dbc.Card([
     dbc.Row([
@@ -296,9 +302,9 @@ index = dbc.Container([
         dbc.Row([
             dbc.Col(html.H3("Fitness doporučení: ", className="text-center m-4"), align="center",
                     style={"color": dark}, xs={"size": 8}, sm={"size": 6}, md={"size": 3}, width={"size": 3}),
-            dbc.Col(dbc.Alert(" ", color="white", className="mt-4 mb-4"), id="one", align="center",
+            dbc.Col(html.Div(children=[],id="alert_1"), align="center",
                     style={"color": "white"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
-            dbc.Col(dbc.Alert(" ", color="white", className="mt-4 mb-4"), id="two", align="center",
+            dbc.Col(html.Div(children=[],id="alert_2"), align="center",
                     style={"color": "white"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
         ], justify="center"),
         dbc.Row([
@@ -387,7 +393,8 @@ def update_output_row(pathname):
                                                     "figure"), Output("graph-3", "figure"),
                 Output("steps", "value"), Output(
                     "steps", "label"), Output("steps", "color"),
-                Output("heartrate", "value"), Output("heartrate", "label"), Output("heartrate", "color")],
+                Output("heartrate", "value"), Output("heartrate", "label"), Output("heartrate", "color"),
+                Output("alert_1", "children")],
                [Input("cls-dpdn", "value"), Input("wk-dpdn", "value"), Input("st-dpdn", "value")])
 def update_card(_class, wk, stu):
     if not stu == None:
@@ -408,10 +415,13 @@ def update_card(_class, wk, stu):
 
         if steps_percent < 50:
             colorBarSteps = red
+            alertOne = generate_alerts("Průměrný počet kroků je velice slabý","danger")
         elif steps_percent >= 50 and steps_percent < 75:
             colorBarSteps = yellow
+            alertOne = generate_alerts("Průměrný počet kroků je dobrá","warning")
         else:
             colorBarSteps = green
+            alertOne = generate_alerts("Průměrný počet kroků je uspokojivý","success")
 
         if heartbeat_percent < 80:
             colorBarHR = green
@@ -420,12 +430,12 @@ def update_card(_class, wk, stu):
         else:
             colorBarHR = red
 
-        return f"Třída: 3.B", f"Věk: {student_age}", f"Pohlaví: {student_sex}", figs[0], figs[1], figs[2], steps_percent, steps_count, colorBarSteps, heartbeat_percent, heartbeat_count, colorBarHR
+        return f"Třída: 3.B", f"Věk: {student_age}", f"Pohlaví: {student_sex}", figs[0], figs[1], figs[2], steps_percent, steps_count, colorBarSteps, heartbeat_percent, heartbeat_count, colorBarHR, alertOne
     else:
         return "Třída: 3.B", "Počet Studentů: 20", "", dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
 
 
-@ app.callback([Output("sleep", "value"), Output("sleep", "label"), Output("sleep", "color"), Output("graph-4", "figure")],
+@ app.callback([Output("sleep", "value"), Output("sleep", "label"), Output("sleep", "color"), Output("graph-4", "figure"), Output("alert_2", "children")],
                [Input("cls-dpdn", "value"), Input("wk-dpdn", "value"), Input("st-dpdn", "value")])
 def update_sleep(_class, _week, _stu):
     if _week == "Distanční":
@@ -438,11 +448,14 @@ def update_sleep(_class, _week, _stu):
     sleep_percent = int((np.mean(sleeps[0])*10/60))
     if sleep_percent < 50:
         colorBarSleep = red
+        alertTwo = generate_alerts("Průměrná délka spánku je velmi krátká","danger")
     elif sleep_percent >= 50 and sleep_percent < 75:
         colorBarSleep = yellow
+        alertTwo = generate_alerts("Průměrná délka spánku je dobrá","warning")
     else:
         colorBarSleep = green
-    return sleep_percent, f"{sleep_val} hodin za noc", colorBarSleep, piechart
+        alertTwo = generate_alerts("Průměrná délka spánku je uspokojivá","success")
+    return sleep_percent, f"{sleep_val} hodin za noc", colorBarSleep, piechart, alertTwo
 
 
 if __name__ == "__main__":
