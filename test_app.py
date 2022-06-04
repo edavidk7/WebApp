@@ -35,7 +35,6 @@ red = "#C85C5C"
 orange = "#F9975D"
 yellow = "#FBD148"
 green = "#B2EA70"
-prumer_kroky_list = []
 
 app = Dash("EduFit", external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP, dbc.icons.FONT_AWESOME], suppress_callback_exceptions=True,
            meta_tags=[{'name': 'viewport',
@@ -247,15 +246,13 @@ index = dbc.Container([
             # ], width={"size": 1}, align="center")
         ], justify="center"),
         dbc.Row([
-            dbc.Col(html.H3("Fitness doporučení: ", className="text-center m-4"), align="center",
-                    style={"color": dark}, xs={"size": 8}, sm={"size": 6}, md={"size": 3}, width={"size": 3}),
-            dbc.Col(dbc.Alert("Velmi nízký denní průměr kroků", color=red, className="mt-4 mb-4"), align="center",
-                    style={"color": "white"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
-            dbc.Col(dbc.Alert("Mírně podprůměrná délka spánku", color=yellow, className="mt-4 mb-4"), align="center", style={
-                    "color": "white", "border-radius": "25px"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
-            dbc.Col(html.Hr(style={'borderWidth': "0.3vh", "width": "100%",
-                    "backgroundColor": "#B4E1FF", "opacity": "1", "margin-bottom": 30}), width={'size': 10}),
+            dbc.Col(html.H3("Fitness doporučení: ", className="text-center m-4"), align="center", style={"color": dark}, xs={"size": 8}, sm={"size": 6}, md={"size": 3}, width={"size": 3}),
+            dbc.Col(dbc.Alert(" ", color="white", className="mt-4 mb-4"), id="one", align="center", style={"color": "white"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
+            dbc.Col(dbc.Alert(" ", color="white", className="mt-4 mb-4"), id="two", align="center", style={"color": "white"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
         ], justify="center"),
+        dbc.Row([
+            dbc.Col(html.Hr(style={'borderWidth': "0.3vh", "width": "100%", "backgroundColor": "#B4E1FF", "opacity": "1", "margin-bottom": 30}), width={'size': 10}),
+        ], justify="center")
     ]),
     html.Div([
         dbc.Row([dbc.Col(html.H1(""))]),
@@ -350,6 +347,7 @@ def update_card(_class, wk, stu):
     steps_percent = int(means[1]/110)
     heartbeat_count = int(means[0])
     heartbeat_percent = int(means[0]/1.5)
+
     if steps_percent < 50:
         colorBarSteps = red
     elif steps_percent >= 50 and steps_percent < 75:
@@ -363,8 +361,8 @@ def update_card(_class, wk, stu):
         colorBarHR = yellow
     else:
         colorBarHR = red
-    return f"Třída: 3.B", f"Věk: {student_age}", f"Pohlaví: {student_sex}", figs[0], figs[1], figs[2], steps_percent, steps_count, colorBarSteps, heartbeat_percent, heartbeat_count, colorBarHR
 
+    return f"Třída: 3.B", f"Věk: {student_age}", f"Pohlaví: {student_sex}", figs[0], figs[1], figs[2], steps_percent, steps_count, colorBarSteps, heartbeat_percent, heartbeat_count, colorBarHR
 
 if __name__ == "__main__":
     app.run_server(debug=True)
