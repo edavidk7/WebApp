@@ -13,7 +13,17 @@ import plotly.graph_objs as go
 
 li = {'admin': ['admin', 'teacher'],
       'student': ['student']}
-
+kind_codes = {"Running": [98, 50, 66, 82],
+              "Walking": [1, 16, 17, 33, 49, 18, 34, 65],
+              "Light_Sleep": [112],
+              "Heavy_Sleep": [122],
+              "Sit": [80, 96, 99],
+              "Standing": [96],
+              "SedentaryInLast5Minutes": [90],
+              "NotWorn": [3],
+              "NotWorn_Charging": [6],
+              "NotWorn_FaceUp": [83],
+              "NotWorn_FaceDown": 115}
 darker = "#242F9B"
 dark = "#646FD4"
 white = "#E8F9FD"
@@ -36,6 +46,55 @@ app.layout = html.Div([
 ])
 
 
+def generate_graphs(file, stu):
+    df = load_dataframe(file)
+    df_person = df[df["ALIAS"] == stu]
+    xs = []
+    ys = []
+    for weekday in df["WEEK_DAY"].unique():
+        daily_entries = df_person[df_person["WEEK_DAY"] == weekday]
+
+        def inner_func(x):
+            return x < 250 and x > 30
+        valid_entries = daily_entries[daily_entries["HEART_RATE"].map(
+            inner_func)]
+        max_heart_rate = valid_entries["HEART_RATE"].max()
+        xs.append(weekday)
+        ys.append(max_heart_rate)
+
+    fig1 = px.bar(x=xs, y=ys, title="Maximum heart rate", text_auto=True)
+    xs = []
+    ys = []
+    for weekday in df["WEEK_DAY"].unique():
+        daily_entries = df_person[df_person["WEEK_DAY"] == weekday]
+        total_steps = daily_entries["STEPS"].sum()
+        xs.append(weekday)
+        ys.append(total_steps)
+
+    fig2 = px.bar(x=xs, y=ys, title="Daily steps")
+    xs = []
+    ys = []
+    for weekday in df["WEEK_DAY"].unique():
+        daily_entries = df_person[df_person["WEEK_DAY"] == weekday]
+
+        def inner_func(x):
+            return x < 250 and x > 30
+
+        def inner_func2(x):
+            return x in kind_codes["Walking"] or x in kind_codes["Standing"] or x in kind_codes["Sit"]
+        valid_entries = daily_entries[daily_entries["HEART_RATE"].map(
+            inner_func)]
+        valid_entries = valid_entries[valid_entries["HEART_RATE"].map(
+            inner_func2)]
+        total_heart_rate = valid_entries["HEART_RATE"].sum()
+        xs.append(weekday)
+        ys.append(total_heart_rate/valid_entries["HEART_RATE"].count())
+
+    fig3 = px.bar(x=xs, y=ys, title="Average heart rate", text_auto=True)
+
+    return fig1, fig2, fig3
+
+
 def load_dataframe(file):
     df = pd.read_feather(file)
     return df
@@ -52,7 +111,7 @@ def generate_values(steps, sleep, rate, freq):
     ]
 
 
-def generate_dropdown():
+def generate_dropdown(file):
     df = load_dataframe(file)
     names = df["ALIAS"].unique()
     return dbc.Row([
@@ -177,27 +236,17 @@ index = dbc.Container([
         ], justify="center"),
     ]),
     html.Div([
-        dbc.Row([dbc.Col(html.H1(" "))]),
-        dbc.Row([dbc.Col(html.H1(" "))]),
+        dbc.Row([dbc.Col(html.H1(""))]),
+        dbc.Row([dbc.Col(html.H1(""))]),
         dbc.Row([
             dbc.Col(
-                dcc.Graph(id="graph", figure={
-                    'data': [
-                        {'x': [1, 2, 3], 'y': [4, 1, 2],
-                            'type': 'bar', 'name': 'SF'},
-                        {'x': [1, 2, 3], 'y': [2, 4, 5],
-                         'type': 'bar', 'name': u'Montréal'},
-                    ],
-                    'layout': {
-                        'title': 'Dash Data Visualization'
-                    }
-                }, className="border border-dark"), className="m-2", width={"size": 4}, xs={"size": 10}, sm={"size": 8}, md={"size": 5}
+                dcc.Graph(id="graph-1", figure={}, className="border border-dark"), className="m-2", width={"size": 4}, xs={"size": 10}, sm={"size": 8}, md={"size": 5}
             ),
             dbc.Col(
-                dcc.Graph(id="sleepgraph", figure={}, className="border border-dark"), className="m-2", width={"size": 4}, xs={"size": 10}, sm={"size": 8}, md={"size": 5}
+                dcc.Graph(id="graph-2", figure={}, className="border border-dark"), className="m-2", width={"size": 4}, xs={"size": 10}, sm={"size": 8}, md={"size": 5}
             ),
             dbc.Col(
-                dcc.Graph(id="rategraph", figure={}, className="border border-dark"), className="m-2", width={"size": 4}, xs={"size": 10}, sm={"size": 8}, md={"size": 5}
+                dcc.Graph(id="graph-3", figure={}, className="border border-dark"), className="m-2", width={"size": 4}, xs={"size": 10}, sm={"size": 8}, md={"size": 5}
             )
 
         ], className="g-0", justify="evenly")
@@ -254,19 +303,25 @@ def update_output_row(input_children):
     if not li.__contains__(input_children):
         return None
     if li[input_children].__contains__("teacher"):
-        return generate_dropdown()
+        return generate_dropdown(file1)
     else:
         return None
 
 
-@ app.callback([Output("stuclass", "children"), Output("stuage", "children"), Output("stusex", "children")],
+@ app.callback([Output("stuclass", "children"), Output("stuage", "children"), Output("stusex", "children"),
+                Output("graph-1", "figure"), Output("graph-2", "figure"), Output("graph-3", "figure")],
                [Input("cls-dpdn", "value"), Input("wk-dpdn", "value"), Input("st-dpdn", "value")])
 def update_card(_class, wk, stu):
+    if wk == "Distanční":
+        file = file1
+    elif wk == "Prezenční":
+        file = file2
     df = load_dataframe(file)
     temp = df[df["ALIAS"] == stu]
     student_age = 2022-int(temp["YoB"].unique()[0])
     student_sex = temp["Sex"].unique()[0]
-    return f"Třída: {_class}", f"Věk: {student_age}", f"Pohlaví: {student_sex}"
+    figs = generate_graphs(file, stu)
+    return f"Třída: {_class}", f"Věk: {student_age}", f"Pohlaví: {student_sex}", figs[0], figs[1], figs[2]
 
 
 if __name__ == "__main__":
