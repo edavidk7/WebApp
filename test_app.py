@@ -1,7 +1,6 @@
 import datetime as dt
 import re
 import base64
-from turtle import color
 import dash
 import dash_bootstrap_components as dbc
 import dash_daq as daq
@@ -203,12 +202,13 @@ def generate_dropdown(file):
         dbc.Col(html.H3("Výběr studenta",
                         className="mt-3 mb-3 ", style={"font-size": "20px", "color": darker}), xs={"size": 5}, sm={"size": 4}, md={"size": 2}, width={
                 "size": 2}, align="center", className="text-center mr-0"),
-       
+
         dbc.Col(dcc.Dropdown(id="st-dpdn", options=names, value="Band 20",), xs={"size": 7}, sm={"size": 5}, md={"size": 2}, width={"size": 2}, className="mt-3 mb-3")], justify="center"),
 
-def generate_alerts(alert1,color1):
-    return  dbc.Alert(alert1,color=color1, class_name="mt-4 mb-4")
-    
+
+def generate_alerts(alert1, color1):
+    return dbc.Alert(alert1, color=color1, class_name="mt-4 mb-4")
+
 
 info_card = dbc.Card([
     dbc.Row([
@@ -229,17 +229,17 @@ info_card = dbc.Card([
 )
 
 login = dbc.Container([
-    dbc.Row([dbc.Col(html.H1("EduFit: Student fitness tracker", className=""), xs={"size": 12}, sm={"size": 12}, md={"size": 8}, width={"size": 6})],
+    dbc.Row([dbc.Col(html.H1("EduFit: sledování zdraví studentů", className=""), xs={"size": 12}, sm={"size": 12}, md={"size": 8}, width={"size": 6})],
             style={'margin-top': '100px', "font-size": "30px", "text-align": "center", "color": darker}, justify="center"),
     dbc.Row([dbc.Col(html.Div(html.Img(src="/static/images/logo.png")))],
             style={'textAlign': 'center'}, justify="center"),
     dbc.Row([dbc.Col(
-        dbc.Input(id="user", type="text", placeholder="Enter Username",
+        dbc.Input(id="user", type="text", placeholder="Uživatelské jméno",
             class_name="alert-primary"), xs={"size": 10}, sm={"size": 8}, md={"size": 5}, width={
             "size": 5}, style={'padding': '10px', 'margin-top': '30px',
                                'font-size': '16px', 'border-width': '3px', "color": dark})], justify="center"),
     dbc.Row([dbc.Col(
-            dbc.Input(id="passw", type="password", placeholder="Enter Password", className="alert-primary mt-3", valid=False, invalid=False),  xs={"size": 10}, sm={"size": 8}, md={"size": 5}, width={
+            dbc.Input(id="passw", type="password", placeholder="Heslo", className="alert-primary mt-3", valid=False, invalid=False),  xs={"size": 10}, sm={"size": 8}, md={"size": 5}, width={
                 "size": 5}, style={'padding': '10px',
                                    'font-size': '16px', 'border-width': '3px', "color": dark})], justify="center"),
     dbc.Row([
@@ -302,9 +302,9 @@ index = dbc.Container([
         dbc.Row([
             dbc.Col(html.H3("Fitness doporučení: ", className="text-center m-4"), align="center",
                     style={"color": dark}, xs={"size": 8}, sm={"size": 6}, md={"size": 3}, width={"size": 3}),
-            dbc.Col(html.Div(children=[],id="alert_1"), align="center",
+            dbc.Col(html.Div(children=[], id="alert_1"), align="center",
                     style={"color": "white"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
-            dbc.Col(html.Div(children=[],id="alert_2"), align="center",
+            dbc.Col(html.Div(children=[], id="alert_2"), align="center",
                     style={"color": "white"}, xs={"size": 8}, sm={"size": 5}, md={"size": 4}, width={"size": 4}),
         ], justify="center"),
         dbc.Row([
@@ -393,7 +393,8 @@ def update_output_row(pathname):
                                                     "figure"), Output("graph-3", "figure"),
                 Output("steps", "value"), Output(
                     "steps", "label"), Output("steps", "color"),
-                Output("heartrate", "value"), Output("heartrate", "label"), Output("heartrate", "color"),
+                Output("heartrate", "value"), Output(
+                    "heartrate", "label"), Output("heartrate", "color"),
                 Output("alert_1", "children")],
                [Input("cls-dpdn", "value"), Input("wk-dpdn", "value"), Input("st-dpdn", "value")])
 def update_card(_class, wk, stu):
@@ -415,13 +416,16 @@ def update_card(_class, wk, stu):
 
         if steps_percent < 50:
             colorBarSteps = red
-            alertOne = generate_alerts("Průměrný počet kroků je velice slabý","danger")
+            alertOne = generate_alerts(
+                "Průměrný počet kroků je velice slabý", "danger")
         elif steps_percent >= 50 and steps_percent < 75:
             colorBarSteps = yellow
-            alertOne = generate_alerts("Průměrný počet kroků je dobrá","warning")
+            alertOne = generate_alerts(
+                "Průměrný počet kroků je dobrá", "warning")
         else:
             colorBarSteps = green
-            alertOne = generate_alerts("Průměrný počet kroků je uspokojivý","success")
+            alertOne = generate_alerts(
+                "Průměrný počet kroků je uspokojivý", "success")
 
         if heartbeat_percent < 80:
             colorBarHR = green
@@ -448,15 +452,17 @@ def update_sleep(_class, _week, _stu):
     sleep_percent = int((np.mean(sleeps[0])*10/60))
     if sleep_percent < 50:
         colorBarSleep = red
-        alertTwo = generate_alerts("Průměrná délka spánku je velmi krátká","danger")
+        alertTwo = generate_alerts(
+            "Průměrná délka spánku je velmi krátká", "danger")
     elif sleep_percent >= 50 and sleep_percent < 75:
         colorBarSleep = yellow
-        alertTwo = generate_alerts("Průměrná délka spánku je dobrá","warning")
+        alertTwo = generate_alerts("Průměrná délka spánku je dobrá", "warning")
     else:
         colorBarSleep = green
-        alertTwo = generate_alerts("Průměrná délka spánku je uspokojivá","success")
+        alertTwo = generate_alerts(
+            "Průměrná délka spánku je uspokojivá", "success")
     return sleep_percent, f"{sleep_val} hodin za noc", colorBarSleep, piechart, alertTwo
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(debug=False)
